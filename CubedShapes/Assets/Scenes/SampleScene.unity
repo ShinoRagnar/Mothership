@@ -824,6 +824,7 @@ MonoBehaviour:
   P_AIR_CABLE: {fileID: 448398, guid: 4de89582137059a4596087e274391b13, type: 2}
   P_AIR_CAP: {fileID: 446510, guid: 9cf03dec5e2842b49bb293defe2c1e13, type: 2}
   P_AIR_HOLDER: {fileID: 400000, guid: 2dccf9728cb01014b9af9235a3355466, type: 2}
+  P_AIR_CORNER: {fileID: 456304, guid: 960baea6a11946940b1f3e9cbc56099e, type: 2}
   P_SFI_WALL_CORNER: {fileID: 450174, guid: 5c72504b77af48641bdb637c797d3a63, type: 2}
   P_SFI_WALL_CORNER_TWO: {fileID: 435452, guid: fbbae8c79c553804899f4f5a7781234d,
     type: 2}
@@ -853,6 +854,13 @@ MonoBehaviour:
   P_SFI_WALL_GRID_DOUBLE: {fileID: 418490, guid: 01e80a6e19a507547917d1d8875ab24f,
     type: 2}
   P_SFI_WALL_SIMPLE_DOUBLE: {fileID: 430366, guid: 4b082aaaeecce3a4cb524f3847e43018,
+    type: 2}
+  P_SFI_WALL_LOW: {fileID: 427990, guid: 4d8527863b14e7c4c995b5ecfca3cf2a, type: 2}
+  P_SFI_WALL_LOW_DOUBLE: {fileID: 422790, guid: b9944421a77c46e4880d2c301632a496,
+    type: 2}
+  P_SFI_WALL_LOW_WINDOW: {fileID: 448426, guid: 181e702324066624f876e5857f953933,
+    type: 2}
+  P_SFI_WALL_LOW_WINDOW_DOUBLE: {fileID: 437168, guid: 86585d76e11d8934c8b8edc544a198ee,
     type: 2}
   P_SFI_GROUND:
   - {fileID: 475816, guid: e1257e5d18870e940aa885eb59d86429, type: 2}

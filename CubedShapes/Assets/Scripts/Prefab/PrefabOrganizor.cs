@@ -12,6 +12,8 @@ public class PrefabOrganizor : MonoBehaviour {
     public Transform P_AIR_CAP;
     public Transform P_AIR_HOLDER;
 
+    public Transform P_AIR_CORNER;
+
     public Transform P_SFI_WALL_CORNER;
     public Transform P_SFI_WALL_CORNER_TWO;
     public Transform P_SFI_WALL_CORNER_TALL_OUT;
@@ -32,6 +34,15 @@ public class PrefabOrganizor : MonoBehaviour {
     public Transform P_SFI_WALL_GRID_DOUBLE;
     public Transform P_SFI_WALL_SIMPLE_DOUBLE;
 
+    public Transform P_SFI_WALL_LOW;
+    public Transform P_SFI_WALL_LOW_DOUBLE;
+    public Transform P_SFI_WALL_LOW_WINDOW;
+    public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
+
+
+
+
+    //low lowdouble window windoudouble
 
 
 

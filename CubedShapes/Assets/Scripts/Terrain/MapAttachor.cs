@@ -71,7 +71,7 @@ public class MapAttachor : MonoBehaviour {
     private void AttachScifiOne()
     {
 
-        int width = lev.rand.Next(4, 12);
+        int width = lev.rand.Next(6, 12);
         //Make even
         if(!(width % 2 == 0)){
             width += 1;
@@ -86,16 +86,56 @@ public class MapAttachor : MonoBehaviour {
         float zStart = 0;
         float xLength = transform.localScale.x;
 
+        string wallVariation = SCIFI_WALL_LOW_IN; //SCIFI_WALL_VARIATIONS[lev.rand.Next(0, SCIFI_WALL_VARIATIONS.Length)];
+
         AttachScifiFloor(tileX, tileZ, xStart, xStop, yStart, zStart, width);
-        AttachScifiWalls(tileX, tileZ, xStart, xStop, yStart-tileX*1.5f, zStart+ tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
-        
+        AttachScifiWalls(wallVariation,tileX, tileZ, xStart, xStop, yStart-tileX*1.5f, zStart+ tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
+        AttachRing(wallVariation, tileX, tileZ, xStart, xStop, yStart - tileX * 1.5f, zStart + tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
 
     }
-    private void AttachScifiWalls(float tileX, float tileZ, float xStart, float xStop, float yStart, float zStart, int width, float xLength){
+    private void AttachRing(string wallVariation, float tileX, float tileZ, float xStart, float xStop, float yStart, float zStart, int width, float xLength)
+    {
+        //System.Collections.Generic.Dictionary<int, Transform> ring = new System.Collections.Generic.Dictionary<int, Transform>();
+
+        Transform airventBlock = po.P_AIR_BLOCK;
+        Transform airventCap = po.P_AIR_CAP;
+
+        float wallPosY = -0.3f;
+        float wallPosX = -1;
+        float wallPosZ = -1.25f;
+
+        if (wallVariation.Equals(SCIFI_WALL_YELLOW))
+        {
+            wallPosY = 0.3f;
+            wallPosX = -1f;
+            wallPosZ = -0.75f;
+        }
+        alignments.Add(airventBlock, new Alignment(xStart, yStart, zStart, 0, 0, 0, 0, 0, 0));
+        alignments[airventBlock].AddAlignment(Alignment.NINETY, xStart, yStart, zStart, 0, 90, 0, 0, 0, 0);
+
+        alignments.Add(airventCap, new Alignment(xStart, yStart, zStart, 0, 270, 0, 0, 0, 0));
+
+        for (int x = 0; x <= xLength + 1; x++)
+        {
+            AttachPart(airventBlock, alignments[airventBlock].SetAlignment(Alignment.ORIGINAL), wallPosX + x * tileX, wallPosY, wallPosZ);
+
+            AttachPart(airventBlock, alignments[airventBlock].SetAlignment(Alignment.ORIGINAL), wallPosX + x * tileX, wallPosY, wallPosZ + (width + 1) * tileZ - tileZ / 2);
+        }
+        AttachPart(airventCap, alignments[airventCap].SetAlignment(Alignment.ORIGINAL), wallPosX + 0, wallPosY, wallPosZ);
+        AttachPart(airventCap, alignments[airventCap].SetAlignment(Alignment.ORIGINAL), wallPosX + 0, wallPosY, wallPosZ + (width + 1) * tileZ - tileZ / 2);
+        for (int z = 0; z < width ; z++)
+        {
+            AttachPart(airventBlock, alignments[airventBlock].SetAlignment(Alignment.NINETY), -0.5f, wallPosY, wallPosZ + (z+2) * tileZ-0.125f);
+            AttachPart(airventBlock, alignments[airventBlock].SetAlignment(Alignment.NINETY), -0.5f + xLength * tileX, wallPosY, wallPosZ + (z + 2) * tileZ - 0.125f);
+        }
+    }
+        private void AttachScifiWalls(string wallVariation, float tileX, float tileZ, float xStart, float xStop, float yStart, float zStart, int width, float xLength){
 
         System.Collections.Generic.Dictionary<int, Transform> corners = new System.Collections.Generic.Dictionary<int, Transform>();
         System.Collections.Generic.Dictionary<int, Transform> walls = new System.Collections.Generic.Dictionary<int, Transform>();
-        string wallVariation = SCIFI_WALL_WATER_OUT; //SCIFI_WALL_VARIATIONS[lev.rand.Next(SCIFI_WALL_VARIATIONS.Length)];
+        System.Collections.Generic.Dictionary<int, Transform> wallDeco = new System.Collections.Generic.Dictionary<int, Transform>();
+
+        int decoFrequency = 6;
 
         if (width > 3)
         {
@@ -130,34 +170,31 @@ public class MapAttachor : MonoBehaviour {
                 walls.Add(2, po.P_SFI_WALL_TALL_SIMPLE);
             } else if (wallVariation.Equals(SCIFI_WALL_LOW_IN)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_LOW_IN);
+                walls.Add(1, po.P_SFI_WALL_LOW);
+                wallDeco.Add(1, po.P_SFI_WALL_LOW_WINDOW);
             } else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_LOW_OUT);
+                walls.Add(1, po.P_SFI_WALL_LOW);
+                wallDeco.Add(1, po.P_SFI_WALL_LOW_WINDOW);
             }
 
             // Set up common alignments
-            foreach(Transform corner in corners.Values){
+            foreach (Transform corner in corners.Values){
                 alignments.Add(corner, new Alignment(xStart + tileX, yStart, zStart, 0, 270, 0, -0.90f, -0.90f, -0.90f));
                 alignments[corner].AddAlignment(Alignment.AWAY_LEFT, xStart + tileX, yStart, zStart, 0, 0, 0, -0.90f, -0.90f, -0.90f);
                 alignments[corner].AddAlignment(Alignment.AWAY_RIGHT, xStart + xLength, yStart, zStart, 0, 90, 0, -0.90f, -0.90f, -0.90f);
                 alignments[corner].AddAlignment(Alignment.TOWARDS_RIGHT, xStart + xLength, yStart, zStart, 0, 180, 0, -0.90f, -0.90f, -0.90f);
                 //Handle exceptions
-                if (wallVariation.Equals(SCIFI_WALL_TALL_OUT) || wallVariation.Equals(SCIFI_WALL_WATER_OUT))
-                {
+                if (wallVariation.Equals(SCIFI_WALL_TALL_OUT) || wallVariation.Equals(SCIFI_WALL_WATER_OUT)){
                     alignments[corner].MoveAllAlignments(0, 0.5f, 0);
-                }
-                else if (wallVariation.Equals(SCIFI_WALL_TALL_IN))
-                {
+                }else if (wallVariation.Equals(SCIFI_WALL_TALL_IN)){
                     alignments[corner].RotateAllAlignments(0, 180, 0);
                     alignments[corner].MoveAllAlignments(0, 0.5f, 0);
-                }
-                else if (wallVariation.Equals(SCIFI_WALL_LOW_IN))
-                {
+                }else if (wallVariation.Equals(SCIFI_WALL_LOW_IN)){
                     alignments[corner].RotateAllAlignments(0, 180, 0);
                     alignments[corner].MoveAllAlignments(0, 0.5f, 0);
                     alignments[corner].ScaleAllAlignments(-0.8f, -0.8f, -0.8f);
-                }
-                else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT))
-                {
+                }else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT)){
                     alignments[corner].MoveAllAlignments(-0.25f, 0.3f, -0.25f);
                     alignments[corner].ScaleAllAlignments(-0.75f, -0.75f, -0.75f);
                     alignments[corner].MoveAlignment(Alignment.AWAY_LEFT, 0, 0, 0.5f);
@@ -180,27 +217,50 @@ public class MapAttachor : MonoBehaviour {
                 {
                     alignments[wall].MoveAllAlignments(0, 0.5f, 0);
                 }
+                if (wallVariation.Equals(SCIFI_WALL_LOW_IN) || wallVariation.Equals(SCIFI_WALL_LOW_OUT))
+                {
+                    alignments[wall].MoveAllAlignments(0.5f, 0, 0);
+                    alignments[wall].MoveAlignment(Alignment.RIGHT, -1f, 0, 0);
+                    alignments[wall].MoveAlignment(Alignment.AWAY, -0.5f, 0, -0.5f);
+                    alignments[wall].MoveAlignment(Alignment.TOWARDS, -0.5f, 0, 0.5f);
+                    alignments[wall].ScaleAllAlignments(-0.8f, -0.8f, -0.8f);
+                }
+
             }
-            // Attach our prefabs
-            //Corners
-            Transform curr = corners[lev.rand.Next(1, corners.Count + 1)];
+            foreach (Transform wallDec in wallDeco.Values)
+            {
+                alignments.Add(wallDec, alignments[walls[1]].Clone());
+            }
+            
+
+
+                // Attach our prefabs
+                //Corners
+                Transform curr = corners[lev.rand.Next(1, corners.Count + 1)];
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.ORIGINAL), 0, 0, tileZ / 2);
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.AWAY_LEFT), 0, 0, (width - 1) * tileZ - tileZ / 2);
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.AWAY_RIGHT), -tileX, 0, (width - 1) * tileZ - tileZ / 2);
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.TOWARDS_RIGHT), -tileX, 0, tileZ / 2);
+
             //Walls
             Transform wallCurr = walls[lev.rand.Next(1, walls.Count + 1)];
             //Left and Right
-            for(float z = 2; z < width-2; z += 2)
-            {
-                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.ORIGINAL), -tileX-0.01f, 0, tileZ/2+z*tileZ);
-                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.RIGHT), 0, 0, tileZ / 2 + z * tileZ);
+            for(float z = 2; z < width-2; z += 2){
+                Transform addWall = wallCurr;
+                if (wallDeco.Count > 0 && lev.rand.Next(1, decoFrequency) == decoFrequency - 1){
+                    addWall = wallDeco[lev.rand.Next(1, walls.Count + 1)];
+                }
+                AttachPart(addWall, alignments[addWall].SetAlignment(Alignment.ORIGINAL), -tileX-0.01f, 0, tileZ/2+z*tileZ);
+                AttachPart(addWall, alignments[addWall].SetAlignment(Alignment.RIGHT), 0, 0, tileZ / 2 + z * tileZ);
             }
             //Front and back
-            for (float x = 2; x < xLength - 2; x += 2)
-            {
-                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.TOWARDS), x*tileX+tileX, 0, -tileZ/2);
-                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.AWAY), x * tileX , 0, width*tileZ-tileZ/2);
+            for (float x = 2; x < xLength - 2; x += 2){
+                Transform addWall = wallCurr;
+                if(wallDeco.Count > 0 && lev.rand.Next(1, decoFrequency) == decoFrequency - 1){
+                    addWall = wallDeco[lev.rand.Next(1, walls.Count + 1)];
+                }
+                AttachPart(addWall, alignments[addWall].SetAlignment(Alignment.TOWARDS), x*tileX+tileX, 0, -tileZ/2);
+                AttachPart(addWall, alignments[addWall].SetAlignment(Alignment.AWAY), x * tileX , 0, width*tileZ-tileZ/2);
 
             }
 
