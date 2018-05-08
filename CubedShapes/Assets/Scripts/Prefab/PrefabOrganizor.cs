@@ -24,6 +24,14 @@ public class PrefabOrganizor : MonoBehaviour {
     public Transform P_SFI_WALL_CORNER_LOW_OUT;
     public Transform P_SFI_WALL_CORNER_LOW_DOUBLE;
 
+    public Transform P_SFI_WALL_YELLOW;
+    public Transform P_SFI_WALL_TALL_SIMPLE;
+    public Transform P_SFI_WALL_TALL_GRID;
+
+    public Transform P_SFI_WALL_DOUBLE;
+    public Transform P_SFI_WALL_GRID_DOUBLE;
+    public Transform P_SFI_WALL_SIMPLE_DOUBLE;
+
 
 
 

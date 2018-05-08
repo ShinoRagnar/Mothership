@@ -845,6 +845,15 @@ MonoBehaviour:
     type: 2}
   P_SFI_WALL_CORNER_LOW_DOUBLE: {fileID: 405494, guid: 18d1c2bb041859948973cb87abf40711,
     type: 2}
+  P_SFI_WALL_YELLOW: {fileID: 453524, guid: 72b917bb743bae1469cef645be653e7c, type: 2}
+  P_SFI_WALL_TALL_SIMPLE: {fileID: 430366, guid: 4b082aaaeecce3a4cb524f3847e43018,
+    type: 2}
+  P_SFI_WALL_TALL_GRID: {fileID: 434158, guid: 77b37c9125700bc49836926b9937ee39, type: 2}
+  P_SFI_WALL_DOUBLE: {fileID: 438514, guid: 6776d80106e414c448e7b9b6c47a42d5, type: 2}
+  P_SFI_WALL_GRID_DOUBLE: {fileID: 418490, guid: 01e80a6e19a507547917d1d8875ab24f,
+    type: 2}
+  P_SFI_WALL_SIMPLE_DOUBLE: {fileID: 430366, guid: 4b082aaaeecce3a4cb524f3847e43018,
+    type: 2}
   P_SFI_GROUND:
   - {fileID: 475816, guid: e1257e5d18870e940aa885eb59d86429, type: 2}
   - {fileID: 493336, guid: 33b9017c8d7f91a499679ab6535ff9c7, type: 2}
@@ -945,7 +954,7 @@ Transform:
   m_GameObject: {fileID: 1138910427}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 11.46, y: -14.25, z: 0.21961594}
-  m_LocalScale: {x: 25, y: 20, z: 1}
+  m_LocalScale: {x: 26, y: 20, z: 1}
   m_Children: []
   m_Father: {fileID: 1918998109}
   m_RootOrder: 2

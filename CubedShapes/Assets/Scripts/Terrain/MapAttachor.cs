@@ -70,8 +70,12 @@ public class MapAttachor : MonoBehaviour {
     }
     private void AttachScifiOne()
     {
-        
-        int width = lev.rand.Next(4, 11);
+
+        int width = lev.rand.Next(4, 12);
+        //Make even
+        if(!(width % 2 == 0)){
+            width += 1;
+        }
 
         float tileZ = po.P_SFI_GROUND[1].localScale.z;
         float tileX = po.P_SFI_GROUND[1].localScale.x;
@@ -91,69 +95,115 @@ public class MapAttachor : MonoBehaviour {
 
         System.Collections.Generic.Dictionary<int, Transform> corners = new System.Collections.Generic.Dictionary<int, Transform>();
         System.Collections.Generic.Dictionary<int, Transform> walls = new System.Collections.Generic.Dictionary<int, Transform>();
-        string wallVariation = SCIFI_WALL_LOW_OUT; //SCIFI_WALL_VARIATIONS[lev.rand.Next(SCIFI_WALL_VARIATIONS.Length)];
+        string wallVariation = SCIFI_WALL_WATER_OUT; //SCIFI_WALL_VARIATIONS[lev.rand.Next(SCIFI_WALL_VARIATIONS.Length)];
 
         if (width > 3)
         {
             // Populate our lists
-            if (wallVariation.Equals(SCIFI_WALL_YELLOW)){
+            if (wallVariation.Equals(SCIFI_WALL_YELLOW)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER);
-                corners.Add(2, po.P_SFI_WALL_CORNER_TWO);
-            }else if (wallVariation.Equals(SCIFI_WALL_TALL_IN)){
+                walls.Add(1, po.P_SFI_WALL_YELLOW);
+            } else if (wallVariation.Equals(SCIFI_WALL_TALL_IN)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_TALL_IN);
-            }else if (wallVariation.Equals(SCIFI_WALL_TALL_OUT)){
+                walls.Add(1, po.P_SFI_WALL_TALL_GRID);
+                walls.Add(2, po.P_SFI_WALL_TALL_SIMPLE);
+            } else if (wallVariation.Equals(SCIFI_WALL_TALL_OUT)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_TALL_OUT);
-            }else if (wallVariation.Equals(SCIFI_WALL_SIMPLE)){
+                walls.Add(1, po.P_SFI_WALL_TALL_GRID);
+                walls.Add(2, po.P_SFI_WALL_TALL_SIMPLE);
+            } else if (wallVariation.Equals(SCIFI_WALL_SIMPLE)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_DOUBLE_SIMPLE);
-            }else if (wallVariation.Equals(SCIFI_WALL_DOUBLE)){
+                walls.Add(1, po.P_SFI_WALL_TALL_GRID);
+                walls.Add(2, po.P_SFI_WALL_TALL_SIMPLE);
+            } else if (wallVariation.Equals(SCIFI_WALL_DOUBLE)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_DOUBLE);
-            }else if (wallVariation.Equals(SCIFI_WALL_WATER_IN)){
+                walls.Add(1, po.P_SFI_WALL_SIMPLE_DOUBLE);
+                walls.Add(2, po.P_SFI_WALL_DOUBLE);
+                walls.Add(3, po.P_SFI_WALL_GRID_DOUBLE);
+            }else if (wallVariation.Equals(SCIFI_WALL_WATER_IN)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_WATER_IN);
-            }else if (wallVariation.Equals(SCIFI_WALL_WATER_OUT)){
+                walls.Add(1, po.P_SFI_WALL_TALL_GRID);
+                walls.Add(2, po.P_SFI_WALL_TALL_SIMPLE);
+            } else if (wallVariation.Equals(SCIFI_WALL_WATER_OUT)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_WATER_OUT);
-            }else if (wallVariation.Equals(SCIFI_WALL_LOW_IN)){
+                walls.Add(1, po.P_SFI_WALL_TALL_GRID);
+                walls.Add(2, po.P_SFI_WALL_TALL_SIMPLE);
+            } else if (wallVariation.Equals(SCIFI_WALL_LOW_IN)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_LOW_IN);
-            }else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT)){
+            } else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT)) {
                 corners.Add(1, po.P_SFI_WALL_CORNER_LOW_OUT);
             }
 
             // Set up common alignments
-            alignments.Add(corners[1], new Alignment(xStart + tileX, yStart, zStart, 0, 270, 0, -0.90f, -0.90f, -0.90f));
-            alignments[corners[1]].AddAlignment(Alignment.AWAY_LEFT, xStart + tileX, yStart, zStart, 0, 0, 0, -0.90f, -0.90f, -0.90f);
-            alignments[corners[1]].AddAlignment(Alignment.AWAY_RIGHT, xStart + xLength, yStart, zStart, 0, 90, 0, -0.90f, -0.90f, -0.90f);
-            alignments[corners[1]].AddAlignment(Alignment.TOWARDS_RIGHT, xStart + xLength, yStart, zStart, 0, 180, 0, -0.90f, -0.90f, -0.90f);
-
-            // Set up theme specific alignment
-            if (wallVariation.Equals(SCIFI_WALL_YELLOW)) {
-                alignments.Add(corners[2], alignments[corners[1]].Clone());
-                alignments[corners[2]].RotateAllAlignments(0, 180, 0);
-            }else if (wallVariation.Equals(SCIFI_WALL_TALL_OUT) || wallVariation.Equals(SCIFI_WALL_WATER_OUT)){
-                alignments[corners[1]].MoveAllAlignments(0, 0.5f, 0);
-            }else if (wallVariation.Equals(SCIFI_WALL_LOW_IN)){
-                alignments[corners[1]].RotateAllAlignments(0, 180, 0);
-                alignments[corners[1]].MoveAllAlignments(0, 0.5f, 0);
-                alignments[corners[1]].ScaleAllAlignments(-0.8f, -0.8f, -0.8f);
-            }else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT)){
-                alignments[corners[1]].MoveAllAlignments(-0.25f, 0.3f, -0.25f);
-                alignments[corners[1]].ScaleAllAlignments(-0.75f, -0.75f, -0.75f);
-                alignments[corners[1]].MoveAlignment(Alignment.AWAY_LEFT, 0, 0, 0.5f);
-                alignments[corners[1]].MoveAlignment(Alignment.AWAY_RIGHT, 0.5f, 0, 0.5f);
-                alignments[corners[1]].MoveAlignment(Alignment.TOWARDS_RIGHT, 0.5f, 0, 0);
-            }else{
-                alignments[corners[1]].RotateAllAlignments(0, 180, 0);
-                alignments[corners[1]].MoveAllAlignments(0, 0.5f, 0);
+            foreach(Transform corner in corners.Values){
+                alignments.Add(corner, new Alignment(xStart + tileX, yStart, zStart, 0, 270, 0, -0.90f, -0.90f, -0.90f));
+                alignments[corner].AddAlignment(Alignment.AWAY_LEFT, xStart + tileX, yStart, zStart, 0, 0, 0, -0.90f, -0.90f, -0.90f);
+                alignments[corner].AddAlignment(Alignment.AWAY_RIGHT, xStart + xLength, yStart, zStart, 0, 90, 0, -0.90f, -0.90f, -0.90f);
+                alignments[corner].AddAlignment(Alignment.TOWARDS_RIGHT, xStart + xLength, yStart, zStart, 0, 180, 0, -0.90f, -0.90f, -0.90f);
+                //Handle exceptions
+                if (wallVariation.Equals(SCIFI_WALL_TALL_OUT) || wallVariation.Equals(SCIFI_WALL_WATER_OUT))
+                {
+                    alignments[corner].MoveAllAlignments(0, 0.5f, 0);
+                }
+                else if (wallVariation.Equals(SCIFI_WALL_TALL_IN))
+                {
+                    alignments[corner].RotateAllAlignments(0, 180, 0);
+                    alignments[corner].MoveAllAlignments(0, 0.5f, 0);
+                }
+                else if (wallVariation.Equals(SCIFI_WALL_LOW_IN))
+                {
+                    alignments[corner].RotateAllAlignments(0, 180, 0);
+                    alignments[corner].MoveAllAlignments(0, 0.5f, 0);
+                    alignments[corner].ScaleAllAlignments(-0.8f, -0.8f, -0.8f);
+                }
+                else if (wallVariation.Equals(SCIFI_WALL_LOW_OUT))
+                {
+                    alignments[corner].MoveAllAlignments(-0.25f, 0.3f, -0.25f);
+                    alignments[corner].ScaleAllAlignments(-0.75f, -0.75f, -0.75f);
+                    alignments[corner].MoveAlignment(Alignment.AWAY_LEFT, 0, 0, 0.5f);
+                    alignments[corner].MoveAlignment(Alignment.AWAY_RIGHT, 0.5f, 0, 0.5f);
+                    alignments[corner].MoveAlignment(Alignment.TOWARDS_RIGHT, 0.5f, 0, 0);
+                }
+                else if (wallVariation.Equals(SCIFI_WALL_YELLOW)){
+                }else{
+                    alignments[corner].RotateAllAlignments(0, 180, 0);
+                    alignments[corner].MoveAllAlignments(0, 0.5f, 0);
+                }
             }
-
-
+            foreach (Transform wall in walls.Values)
+            {
+                alignments.Add(wall, new Alignment(xStart + tileX, yStart, zStart, 0, 270, 0, -0.90f, -0.90f, -0.90f));
+                alignments[wall].AddAlignment(Alignment.AWAY, xStart + tileX, yStart, zStart, 0, 0, 0, -0.90f, -0.90f, -0.90f);
+                alignments[wall].AddAlignment(Alignment.RIGHT, xStart + xLength, yStart, zStart, 0, 90, 0, -0.90f, -0.90f, -0.90f);
+                alignments[wall].AddAlignment(Alignment.TOWARDS, xStart, yStart, zStart, 0, 180, 0, -0.90f, -0.90f, -0.90f);
+                if (!wallVariation.Equals(SCIFI_WALL_YELLOW))
+                {
+                    alignments[wall].MoveAllAlignments(0, 0.5f, 0);
+                }
+            }
             // Attach our prefabs
+            //Corners
             Transform curr = corners[lev.rand.Next(1, corners.Count + 1)];
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.ORIGINAL), 0, 0, tileZ / 2);
-            curr = corners[lev.rand.Next(1, corners.Count + 1)];
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.AWAY_LEFT), 0, 0, (width - 1) * tileZ - tileZ / 2);
-            curr = corners[lev.rand.Next(1, corners.Count + 1)];
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.AWAY_RIGHT), -tileX, 0, (width - 1) * tileZ - tileZ / 2);
-            curr = corners[lev.rand.Next(1, corners.Count + 1)];
             AttachPart(curr, alignments[curr].SetAlignment(Alignment.TOWARDS_RIGHT), -tileX, 0, tileZ / 2);
+            //Walls
+            Transform wallCurr = walls[lev.rand.Next(1, walls.Count + 1)];
+            //Left and Right
+            for(float z = 2; z < width-2; z += 2)
+            {
+                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.ORIGINAL), -tileX-0.01f, 0, tileZ/2+z*tileZ);
+                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.RIGHT), 0, 0, tileZ / 2 + z * tileZ);
+            }
+            //Front and back
+            for (float x = 2; x < xLength - 2; x += 2)
+            {
+                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.TOWARDS), x*tileX+tileX, 0, -tileZ/2);
+                AttachPart(wallCurr, alignments[wallCurr].SetAlignment(Alignment.AWAY), x * tileX , 0, width*tileZ-tileZ/2);
+
+            }
+
         }
     }
 

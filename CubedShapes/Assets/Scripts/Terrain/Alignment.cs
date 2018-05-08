@@ -25,7 +25,10 @@ public class Alignment {
     public static string TOWARDS_RIGHT  = "TOWARDS_CAM_RIGH";
     public static string AWAY_LEFT      = "AWAY_LEFT";
     public static string AWAY_RIGHT     = "AWAY_RIGHT";
-
+    public static string AWAY           = "AWAY";
+    public static string TOWARDS        = "TOWARDS";
+    public static string LEFT           = "LEFT";
+    public static string RIGHT          = "RIGHT";
     public static string ZERO           = "0DEGREES";
     public static string NINETY         = "90DEGREES";
     public static string ONEEIGHTY      = "180DEGREES";
