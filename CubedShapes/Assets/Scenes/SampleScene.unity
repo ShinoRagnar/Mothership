@@ -825,6 +825,9 @@ MonoBehaviour:
   P_AIR_CAP: {fileID: 446510, guid: 9cf03dec5e2842b49bb293defe2c1e13, type: 2}
   P_AIR_HOLDER: {fileID: 400000, guid: 2dccf9728cb01014b9af9235a3355466, type: 2}
   P_AIR_CORNER: {fileID: 456304, guid: 960baea6a11946940b1f3e9cbc56099e, type: 2}
+  P_AIR_WALL: {fileID: 427052, guid: a2ef3a675fdb03f4ea0219ee7fb58311, type: 2}
+  P_SFI_BASE: {fileID: 477704, guid: e59fee3f59b616c4380cf2c8f45bb473, type: 2}
+  P_SFI_BASE_SPLICE: {fileID: 481786, guid: 25284667b1edfa445a7fe67b4058c148, type: 2}
   P_SFI_WALL_CORNER: {fileID: 450174, guid: 5c72504b77af48641bdb637c797d3a63, type: 2}
   P_SFI_WALL_CORNER_TWO: {fileID: 435452, guid: fbbae8c79c553804899f4f5a7781234d,
     type: 2}
@@ -1467,8 +1470,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1884391526}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 37.3, y: 0.86, z: 0.21961594}
-  m_LocalScale: {x: 10, y: 20, z: 1}
+  m_LocalPosition: {x: 38.31, y: 0.86, z: 0.21961594}
+  m_LocalScale: {x: 12, y: 20, z: 1}
   m_Children: []
   m_Father: {fileID: 1918998109}
   m_RootOrder: 6
