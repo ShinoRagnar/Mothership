@@ -9,7 +9,7 @@ public class MapAttachor : MonoBehaviour {
     public string attachmentName;
 
     //Statics
-    private static string NODE_CLONES = "xClones";
+    //private static string NODE_CLONES = "xClones";
 
     //Static Themes
     private static string SCIFI_WALL_YELLOW = "WALL_YELLOW";
@@ -54,20 +54,23 @@ public class MapAttachor : MonoBehaviour {
 
         parts = new System.Collections.Generic.Dictionary<int, Transform>();
         alignments = new System.Collections.Generic.Dictionary<Transform, Alignment>();
-        if (attachmentName == "")
-        {
-            attachmentName = "xAirVent";
-        }
-        if (attachmentName == "xAirVent")
-        {
-            AttachAirVent();
-        } else if (attachmentName == "xScifiOne")
-        {
-            AttachScifiOne();
-        }
-        if (!coreVisible)
-        {
-            GetComponent<MeshRenderer>().enabled = false;
+
+        if (DevelopmentSettings.SHOW_ATTACHMENTS) { 
+            if (attachmentName == "")
+            {
+                attachmentName = "xAirVent";
+            }
+            if (attachmentName == "xAirVent")
+            {
+                AttachAirVent();
+            } else if (attachmentName == "xScifiOne")
+            {
+                AttachScifiOne();
+            }
+            if (!coreVisible)
+            {
+                GetComponent<MeshRenderer>().enabled = false;
+            }
         }
     }
     private void AttachScifiOne()
@@ -298,8 +301,8 @@ public class MapAttachor : MonoBehaviour {
                 if (wallDeco.Count > 0 && lev.rand.Next(1, decoFrequency) == decoFrequency - 1) {
                     addWall = wallDeco[lev.rand.Next(1, walls.Count + 1)];
                 }
-                AttachPart(addWall, terr, alignments[addWall].SetAlignment(Alignment.ORIGINAL), -tileX - 0.01f, 0, tileZ / 2 + z * tileZ);
-                AttachPart(addWall, terr, alignments[addWall].SetAlignment(Alignment.RIGHT), 0, 0, tileZ / 2 + z * tileZ);
+                AttachPart(addWall,NO_SHADOWS, alignments[addWall].SetAlignment(Alignment.ORIGINAL), -tileX - 0.01f, 0, tileZ / 2 + z * tileZ);
+                AttachPart(addWall,NO_SHADOWS, alignments[addWall].SetAlignment(Alignment.RIGHT), 0, 0, tileZ / 2 + z * tileZ);
             }
             //Front and back
             for (float x = 2; x < xLength - 2; x += 2) {
@@ -389,22 +392,22 @@ public class MapAttachor : MonoBehaviour {
         {
             if (xPos == startXPos)
             {
-                AttachPart(cap, alignments[cap], xPos, yPos, 0);
+                AttachPart(cap,NO_SHADOWS, alignments[cap], xPos, yPos, 0);
                 AttachPart(holder, alignments[holder], xPos, yPos, 0);
                 for (yCable = yPos + middleShiftY; yCable < lev.getTopY() - cableOffset || yPos + middleShiftY == yCable; yCable += cable.localScale.y * hangerScaleY)
                 {
-                    AttachPart(cable, alignments[cable], xPos, yCable, 0);
+                    AttachPart(cable,NO_SHADOWS, alignments[cable], xPos, yCable, 0);
                 }
             }
             AttachPart(block, alignments[block], xPos, yPos, 0);
         }
-        AttachPart(cap, alignments[cap].SetAlignment(Alignment.END), xPos, yPos, 0);
+        AttachPart(cap,NO_SHADOWS, alignments[cap].SetAlignment(Alignment.END), xPos, yPos, 0);
         AttachPart(holder, alignments[holder].SetAlignment(Alignment.END), xPos, yPos, 0);
-        AttachPart(cable, alignments[cable].SetAlignment(Alignment.END), xPos, yPos, 0);
+        AttachPart(cable,NO_SHADOWS, alignments[cable].SetAlignment(Alignment.END), xPos, yPos, 0);
 
         for (yCable = yPos + middleShiftY; yCable < lev.getTopY() - cableOffset || yPos + middleShiftY == yCable; yCable += cable.localScale.y * hangerScaleY)
         {
-            AttachPart(cable, alignments[cable].SetAlignment(Alignment.END), xPos, yCable, 0);
+            AttachPart(cable,NO_SHADOWS, alignments[cable].SetAlignment(Alignment.END), xPos, yCable, 0);
         }
 
     }
@@ -464,7 +467,7 @@ public class MapAttachor : MonoBehaviour {
         }
         ret.localScale += new Vector3(align.scaleX, align.scaleY, align.scaleZ);
         parts.Add(partNumber, ret);
-        ret.parent = GameObject.Find(NODE_CLONES).transform;
+        ret.parent = GameObject.Find(DevelopmentSettings.CLONES_NODE).transform;
         partNumber++;
 
         return ret;

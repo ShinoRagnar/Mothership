@@ -19,14 +19,16 @@ public class BoundsAttachor : MonoBehaviour {
         CreateBounds(level.getTopAndBottomX(), level.getBottomY(), level.width, 0);
         CreateBounds(level.getRightX(), 0, 0, level.height);
 
-        if (water != null)
-        {
-            Transform t = water.GetComponent<Transform>();
-            t.Translate(new Vector3(0, -level.height/2+ WATER_LEVEL, 0));
-            MeshRenderer mr = water.GetComponent<MeshRenderer>();
-            if (mr != null)
+        if (DevelopmentSettings.SHOW_OCEAN) { 
+            if (water != null)
             {
-                mr.enabled = true;
+                Transform t = water.GetComponent<Transform>();
+                t.Translate(new Vector3(0, -level.height/2+ WATER_LEVEL, 0));
+                MeshRenderer mr = water.GetComponent<MeshRenderer>();
+                if (mr != null)
+                {
+                    mr.enabled = true;
+                }
             }
         }
 
