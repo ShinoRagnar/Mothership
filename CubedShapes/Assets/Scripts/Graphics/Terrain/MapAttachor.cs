@@ -63,7 +63,8 @@ public class MapAttachor : MonoBehaviour {
             if (attachmentName == "xAirVent")
             {
                 AttachAirVent();
-            } else if (attachmentName == "xScifiOne")
+            }
+            else if (attachmentName == "xScifiOne")
             {
                 AttachScifiOne();
             }
@@ -167,8 +168,11 @@ public class MapAttachor : MonoBehaviour {
         for (int x = 0; x <= xLength + 1; x++)
         {
             AttachPart(airventBlock, terr, alignments[airventBlock].SetAlignment(Alignment.ORIGINAL), wallPosX + x * tileX, wallPosY, wallPosZ);
-
-            AttachPart(airventBlock, terr, alignments[airventBlock].SetAlignment(Alignment.ORIGINAL), wallPosX + x * tileX, wallPosY, wallPosZ + (width + 1) * tileZ - tileZ / 2);
+            //Hide backside segments
+            if (x == 0 || x == 1 || x == xLength + 1 || x == xLength)
+            {
+                AttachPart(airventBlock, terr, alignments[airventBlock].SetAlignment(Alignment.ORIGINAL), wallPosX + x * tileX, wallPosY, wallPosZ + (width + 1) * tileZ - tileZ / 2);
+            }
         }
         AttachPart(airventCap, terr, alignments[airventCap].SetAlignment(Alignment.ORIGINAL), wallPosX + 0, wallPosY, wallPosZ);
         AttachPart(airventCap, terr, alignments[airventCap].SetAlignment(Alignment.NINETY), wallPosX + (xLength + 2) * tileX, wallPosY, wallPosZ + tileZ - 0.125f);

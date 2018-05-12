@@ -36,7 +36,7 @@ GameObject:
   - component: {fileID: 4605956939492818}
   - component: {fileID: 95542924609023440}
   m_Layer: 0
-  m_Name: LowPolyAlien5
+  m_Name: AlienWhiteLP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
