@@ -43,7 +43,8 @@ public class PrefabOrganizor : MonoBehaviour {
     public Transform P_SFI_WALL_LOW_WINDOW;
     public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
 
-
+    // Rifles
+    public Transform[] P_SFI_RIFLES;
 
 
     //low lowdouble window windoudouble

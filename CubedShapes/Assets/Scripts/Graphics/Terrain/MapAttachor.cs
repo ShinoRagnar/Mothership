@@ -100,7 +100,7 @@ public class MapAttachor : MonoBehaviour {
         AttachScifiFloor(tileX, tileZ, xStart, xStop, yStart, zStart, width);
         AttachScifiWalls(wallVariation, tileX, tileZ, xStart, xStop, yStart - tileX * 1.5f, zStart + tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
         AttachRing(wallVariation, tileX, tileZ, xStart, xStop, yStart - tileX * 1.5f, zStart + tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
-        AttachBase(wallVariation, tileX, tileZ, xStart, xStop, yStart - tileX * 1.5f, zStart + tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
+        //AttachBase(wallVariation, tileX, tileZ, xStart, xStop, yStart - tileX * 1.5f, zStart + tileZ - (Mathf.Round(width / 2f)) * tileZ, width, xLength);
     }
     private void AttachBase(string wallVariation, float tileX, float tileZ, float xStart, float xStop, float yStart, float zStart, int width, float xLength) {
 

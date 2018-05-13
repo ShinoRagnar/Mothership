@@ -29,9 +29,75 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		CapsuleCollider m_Capsule;
 		bool m_Crouching;
 
+        // Animation states
+        public bool rifling;
+        public bool shooting;
+        public bool equipped;
+
+        //Head IK
+        private float lookIKWeight;
+        private float bodyWeight;
+        private float headWeight;
+        private float eyesWeight;
+        private float clampWeight;
+
+        //Foot IK
+        Transform leftFoot;
+        Transform rightFoot;
+
+        private Transform lookingAt;
+
+
+        public void Equip(Transform equip, Vector3 move, Vector3 rot, Vector3 scale)//Transform transform, string node, bool rifle)
+        {
+            if (!equipped)
+            {
+                System.Collections.ArrayList search = new System.Collections.ArrayList();
+                FindChild(search, "hand_r", this.transform);
+                foreach (Transform t in search)
+                {
+                    Transform eq = Instantiate(equip, t);
+                    eq.position += move;
+                    eq.Rotate(rot);
+                    eq.localScale += scale;
+                    //break;
+                    //equip.parent = t;
+
+                    //Debug.Log(t.gameObject.name);
+                }
+            }
+            equipped = true;
+
+        }
+        private void FindChild(System.Collections.ArrayList search, string name, Transform t)
+        {
+            foreach(Transform child in t)
+            {
+                if(child.gameObject.name.Equals(name))
+                {
+                    search.Add(child);
+                }
+                else
+                {
+                    FindChild(search, name, child);
+                }
+            }
+        }
+        public void LookAt(Transform lookTarget)
+        {
+            lookingAt = lookTarget;
+            lookIKWeight = 1;
+            bodyWeight = 0.1f;
+            headWeight = 1;
+            eyesWeight = 0;
+            clampWeight = 1;
+    }
 
 		void Start()
 		{
+            rifling = false;
+            shooting = false;
+
 			m_Animator = GetComponent<Animator>();
 			m_Rigidbody = GetComponent<Rigidbody>();
 			m_Capsule = GetComponent<CapsuleCollider>();
@@ -40,10 +106,14 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 			m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 			m_OrigGroundCheckDistance = m_GroundCheckDistance;
-		}
+
+            leftFoot = m_Animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+            rightFoot = m_Animator.GetBoneTransform(HumanBodyBones.RightFoot);
+
+        }
 
 
-		public void Move(Vector3 move, bool crouch, bool jump)
+        public void Move(Vector3 move, bool crouch, bool jump)
 		{
 
 			// convert the world relative moveInput vector into a local-relative
@@ -113,17 +183,39 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				}
 			}
 		}
+        private void OnAnimatorIK(int layerIndex)
+        {
+            if(lookingAt != null)
+            {
+                m_Animator.SetLookAtWeight(lookIKWeight, bodyWeight, headWeight, eyesWeight, clampWeight);
+                m_Animator.SetLookAtPosition(lookingAt.position);
+                // Debug.Log(lookingAt.position);
+            }
+            if (m_ForwardAmount == 0 && m_TurnAmount == 0) {
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+                m_Animator.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot.position);
+                m_Animator.SetIKPosition(AvatarIKGoal.RightFoot, rightFoot.position);
+            }
+            else {
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
+            }
+        }
 
 
-		void UpdateAnimator(Vector3 move)
+        void UpdateAnimator(Vector3 move)
 		{
 			// update the animator parameters
 			m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetBool("Crouch", m_Crouching);
 			m_Animator.SetBool("OnGround", m_IsGrounded);
-			if (!m_IsGrounded)
+            m_Animator.SetBool("Rifling", rifling);
+            m_Animator.SetBool("Shooting", shooting);
+            if (!m_IsGrounded)
 			{
+
 				m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
 			}
 
