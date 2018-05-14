@@ -29,7 +29,7 @@ public class EnemyAI : MonoBehaviour {
 
         character.Equip(po.P_SFI_RIFLES[0]
             ,new Vector3(0.0988f,0,0.03953f)
-            ,new Vector3(33.027f,-94.250f,-94.309f)
+            ,new Vector3(33.027f,-96.250f,-94.309f)
             ,new Vector3(-0.2f,-0.2f,-0.4f));
 
         player = GameObject.Find("Player").transform;

@@ -45,26 +45,29 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         Transform leftFoot;
         Transform rightFoot;
 
+        private Transform rightHand;
         private Transform lookingAt;
-
+        private Transform equippedWeapon;
 
         public void Equip(Transform equip, Vector3 move, Vector3 rot, Vector3 scale)//Transform transform, string node, bool rifle)
         {
             if (!equipped)
             {
                 System.Collections.ArrayList search = new System.Collections.ArrayList();
-                FindChild(search, "hand_r", this.transform);
-                foreach (Transform t in search)
-                {
-                    Transform eq = Instantiate(equip, t);
+                
+                //FindChild(search, "hand_r", this.transform);
+                //foreach (Transform t in search)
+                //{
+                    Transform eq = Instantiate(equip, rightHand);
                     eq.position += move;
                     eq.Rotate(rot);
                     eq.localScale += scale;
                     //break;
                     //equip.parent = t;
+                    equippedWeapon = equip;
 
                     //Debug.Log(t.gameObject.name);
-                }
+                //}
             }
             equipped = true;
 
@@ -109,6 +112,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
             leftFoot = m_Animator.GetBoneTransform(HumanBodyBones.LeftFoot);
             rightFoot = m_Animator.GetBoneTransform(HumanBodyBones.RightFoot);
+            rightHand = m_Animator.GetBoneTransform(HumanBodyBones.RightHand);
+            
 
         }
 
@@ -201,6 +206,19 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
                 m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
             }
+            /*
+            if (rifling && equippedWeapon != null)
+            {
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
+                m_Animator.SetIKPosition(AvatarIKGoal.LeftHand, equippedWeapon.position);
+                m_Animator.SetIKPosition(AvatarIKGoal.RightHand, equippedWeapon.position);
+            }
+            else
+            {
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
+                m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
+            }*/
         }
 
 
