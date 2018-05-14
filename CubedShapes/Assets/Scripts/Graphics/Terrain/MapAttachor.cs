@@ -43,13 +43,13 @@ public class MapAttachor : MonoBehaviour {
     private System.Collections.Generic.Dictionary<int, Transform> parts;
     private int partNumber = 0;
     private System.Collections.Generic.Dictionary<Transform, Alignment> alignments;
-    private PrefabOrganizor po;
+    private Organizer po;
 
     private static TerrainSettings NO_SHADOWS = (new TerrainSettings()).TurnOffShadows();
 
     // Use this for initialization
     void Start() {
-        po = PrefabOrganizor.instance;
+        po = Organizer.instance;
         lev = Level.instance;
 
         parts = new System.Collections.Generic.Dictionary<int, Transform>();

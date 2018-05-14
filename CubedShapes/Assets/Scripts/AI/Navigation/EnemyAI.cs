@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityStandardAssets.Characters.ThirdPerson;
 
 public class EnemyAI : MonoBehaviour {
 
@@ -10,27 +9,33 @@ public class EnemyAI : MonoBehaviour {
 
     private NavMeshAgent meshAgent;
     private Camera mainCam;
-    public ThirdPersonCharacter character;
-    public Transform player;
+    private CharacterAnimation character;
+    private Animator anim;
+    private Transform player;
+    private ItemEquiper itemEquiper;
 
     bool rifling;
     bool shooting;
 
-    PrefabOrganizor po;
-    Transform rifle;
+    private Organizer o;
 
-	// Use this for initialization
-	void Start () {
-        po = PrefabOrganizor.instance;
-        character = GetComponent<ThirdPersonCharacter>();
+    // Use this for initialization
+    private void Awake()
+    {
+        character = GetComponent<CharacterAnimation>();
         meshAgent = GetComponent<NavMeshAgent>();
+        anim = GetComponent<Animator>();
+        itemEquiper = GetComponent<ItemEquiper>();
+    }
+
+    void Start () {
+        o = Organizer.instance;
+
         mainCam = GameObject.Find("MainCamera").GetComponent<Camera>();
         meshAgent.updateRotation = false;
 
-        character.Equip(po.P_SFI_RIFLES[0]
-            ,new Vector3(0.0988f,0,0.03953f)
-            ,new Vector3(33.027f,-96.250f,-94.309f)
-            ,new Vector3(-0.2f,-0.2f,-0.4f));
+        Gun rifle = o.GUN_STANDARD_RIFLE.Clone();
+        itemEquiper.EquipItem(rifle, anim.GetBoneTransform(HumanBodyBones.RightHand));
 
         player = GameObject.Find("Player").transform;
         character.LookAt(player);
@@ -39,6 +44,7 @@ public class EnemyAI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
         if (Input.GetButton("AIRifleUp"))
         {
             if (!rifling)
