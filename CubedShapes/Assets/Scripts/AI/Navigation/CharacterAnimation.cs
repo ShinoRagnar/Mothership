@@ -15,8 +15,7 @@ using System.Collections.Generic;
 		[SerializeField] float m_AnimSpeedMultiplier = 1f;
 		[SerializeField] float m_GroundCheckDistance = 0.2f;
 
-		Rigidbody m_Rigidbody;
-		Animator m_Animator;
+
 		bool m_IsGrounded;
 		float m_OrigGroundCheckDistance;
 		const float k_Half = 0.5f;
@@ -25,7 +24,7 @@ using System.Collections.Generic;
 		Vector3 m_GroundNormal;
 		float m_CapsuleHeight;
 		Vector3 m_CapsuleCenter;
-		CapsuleCollider m_Capsule;
+
 		bool m_Crouching;
 
         // Animation states
@@ -43,11 +42,40 @@ using System.Collections.Generic;
         //Foot IK
         private Transform leftFoot;
         private Transform rightFoot;
-
+        //Hand IK
         private Transform rightHand;
+        //Head IK
         private Transform lookingAt;
 
+        // Components
         private ItemEquiper itemEquiper;
+        private Rigidbody rigid;
+        private Animator anim;
+        private CapsuleCollider capsule;
+
+        public void Awake()
+        {
+            itemEquiper = GetComponent<ItemEquiper>();
+            anim = GetComponent<Animator>();
+            rigid = GetComponent<Rigidbody>();
+            capsule = GetComponent<CapsuleCollider>();
+        }
+
+        void Start()
+		{
+            rifling = false;
+            shooting = false;
+
+            m_CapsuleHeight = capsule.height;
+			m_CapsuleCenter = capsule.center;
+
+			rigid.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+			m_OrigGroundCheckDistance = m_GroundCheckDistance;
+
+            leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
+            rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
+            rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
+        }
 
         public void LookAt(Transform lookTarget)
         {
@@ -58,30 +86,6 @@ using System.Collections.Generic;
             eyesWeight = 0;
             clampWeight = 1;
         }
-        public void Awake()
-        {
-            rifling = false;
-            shooting = false;
-            itemEquiper = GetComponent<ItemEquiper>();
-            m_Animator = GetComponent<Animator>();
-            m_Rigidbody = GetComponent<Rigidbody>();
-            m_Capsule = GetComponent<CapsuleCollider>();
-        }
-
-        void Start()
-		{
-			m_CapsuleHeight = m_Capsule.height;
-			m_CapsuleCenter = m_Capsule.center;
-
-			m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-			m_OrigGroundCheckDistance = m_GroundCheckDistance;
-
-            leftFoot = m_Animator.GetBoneTransform(HumanBodyBones.LeftFoot);
-            rightFoot = m_Animator.GetBoneTransform(HumanBodyBones.RightFoot);
-            rightHand = m_Animator.GetBoneTransform(HumanBodyBones.RightHand);
-        }
-
-
         public void Move(Vector3 move, bool crouch, bool jump)
 		{
 
@@ -127,21 +131,21 @@ using System.Collections.Generic;
 			if (m_IsGrounded && crouch)
 			{
 				if (m_Crouching) return;
-				m_Capsule.height = m_Capsule.height / 2f;
-				m_Capsule.center = m_Capsule.center / 2f;
+				capsule.height = capsule.height / 2f;
+				capsule.center = capsule.center / 2f;
 				m_Crouching = true;
 			}
 			else
 			{
-				Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-				float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-				if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+				Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
+				float crouchRayLength = m_CapsuleHeight - capsule.radius * k_Half;
+				if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
 				{
 					m_Crouching = true;
 					return;
 				}
-				m_Capsule.height = m_CapsuleHeight;
-				m_Capsule.center = m_CapsuleCenter;
+				capsule.height = m_CapsuleHeight;
+				capsule.center = m_CapsuleCenter;
 				m_Crouching = false;
 			}
 		}
@@ -151,9 +155,9 @@ using System.Collections.Generic;
 			// prevent standing up in crouch-only zones
 			if (!m_Crouching)
 			{
-				Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-				float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-				if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+				Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
+				float crouchRayLength = m_CapsuleHeight - capsule.radius * k_Half;
+				if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
 				{
 					m_Crouching = true;
 				}
@@ -163,19 +167,19 @@ using System.Collections.Generic;
         {
             if(lookingAt != null)
             {
-                m_Animator.SetLookAtWeight(lookIKWeight, bodyWeight, headWeight, eyesWeight, clampWeight);
-                m_Animator.SetLookAtPosition(lookingAt.position);
+                anim.SetLookAtWeight(lookIKWeight, bodyWeight, headWeight, eyesWeight, clampWeight);
+                anim.SetLookAtPosition(lookingAt.position);
                 // Debug.Log(lookingAt.position);
             }
             if (m_ForwardAmount == 0 && m_TurnAmount == 0) {
-                m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
-                m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
-                m_Animator.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot.position);
-                m_Animator.SetIKPosition(AvatarIKGoal.RightFoot, rightFoot.position);
+                anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+                anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+                anim.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot.position);
+                anim.SetIKPosition(AvatarIKGoal.RightFoot, rightFoot.position);
             }
             else {
-                m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
-                m_Animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
+                anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
+                anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
             }
             /*
             if (rifling && equippedWeapon != null)
@@ -196,16 +200,16 @@ using System.Collections.Generic;
         void UpdateAnimator(Vector3 move)
 		{
 			// update the animator parameters
-			m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
-			m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
-			m_Animator.SetBool("Crouch", m_Crouching);
-			m_Animator.SetBool("OnGround", m_IsGrounded);
-            m_Animator.SetBool("Rifling", rifling);
-            m_Animator.SetBool("Shooting", shooting);
+			anim.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
+			anim.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
+			anim.SetBool("Crouch", m_Crouching);
+			anim.SetBool("OnGround", m_IsGrounded);
+            anim.SetBool("Rifling", rifling);
+            anim.SetBool("Shooting", shooting);
             if (!m_IsGrounded)
 			{
 
-				m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
+				anim.SetFloat("Jump", rigid.velocity.y);
 			}
 
 			// calculate which leg is behind, so as to leave that leg trailing in the jump animation
@@ -213,23 +217,23 @@ using System.Collections.Generic;
 			// and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
 			float runCycle =
 				Mathf.Repeat(
-					m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
+					anim.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
 			float jumpLeg = (runCycle < k_Half ? 1 : -1) * m_ForwardAmount;
 			if (m_IsGrounded)
 			{
-				m_Animator.SetFloat("JumpLeg", jumpLeg);
+				anim.SetFloat("JumpLeg", jumpLeg);
 			}
 
 			// the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
 			// which affects the movement speed because of the root motion.
 			if (m_IsGrounded && move.magnitude > 0)
 			{
-				m_Animator.speed = m_AnimSpeedMultiplier;
+				anim.speed = m_AnimSpeedMultiplier;
 			}
 			else
 			{
 				// don't use that while airborne
-				m_Animator.speed = 1;
+				anim.speed = 1;
 			}
 		}
 
@@ -238,21 +242,21 @@ using System.Collections.Generic;
 		{
 			// apply extra gravity from multiplier:
 			Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
-			m_Rigidbody.AddForce(extraGravityForce);
+			rigid.AddForce(extraGravityForce);
 
-			m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
+			m_GroundCheckDistance = rigid.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
 		}
 
 
 		void HandleGroundedMovement(bool crouch, bool jump)
 		{
 			// check whether conditions are right to allow a jump:
-			if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
+			if (jump && !crouch && anim.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
 			{
 				// jump!
-				m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, m_JumpPower, m_Rigidbody.velocity.z);
+				rigid.velocity = new Vector3(rigid.velocity.x, m_JumpPower, rigid.velocity.z);
 				m_IsGrounded = false;
-				m_Animator.applyRootMotion = false;
+				anim.applyRootMotion = false;
 				m_GroundCheckDistance = 0.1f;
 			}
 		}
@@ -271,11 +275,11 @@ using System.Collections.Generic;
 			// this allows us to modify the positional speed before it's applied.
 			if (m_IsGrounded && Time.deltaTime > 0)
 			{
-				Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+				Vector3 v = (anim.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
 
 				// we preserve the existing y part of the current velocity.
-				v.y = m_Rigidbody.velocity.y;
-				m_Rigidbody.velocity = v;
+				v.y = rigid.velocity.y;
+				rigid.velocity = v;
 			}
 		}
 
@@ -293,13 +297,13 @@ using System.Collections.Generic;
 			{
 				m_GroundNormal = hitInfo.normal;
 				m_IsGrounded = true;
-				m_Animator.applyRootMotion = true;
+				anim.applyRootMotion = true;
 			}
 			else
 			{
 				m_IsGrounded = false;
 				m_GroundNormal = Vector3.up;
-				m_Animator.applyRootMotion = false;
+				anim.applyRootMotion = false;
 			}
 		}
 	}
