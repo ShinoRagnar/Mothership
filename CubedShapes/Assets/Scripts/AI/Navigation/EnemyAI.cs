@@ -38,6 +38,8 @@ public class EnemyAI : MonoBehaviour {
         itemEquiper.EquipItem(rifle);
         rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
+        //Instantiate(o.E_MUZZLE_FLASHES[3], new Vector3(0, 5, 0), new Quaternion());
+
         player = GameObject.Find("Player").transform;
         character.LookAt(player);
 

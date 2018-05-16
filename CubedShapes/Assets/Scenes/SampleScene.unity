@@ -1124,16 +1124,7 @@ MonoBehaviour:
   - {fileID: 4071681106882876, guid: d982e385480ed324db57470e3e10073b, type: 2}
   - {fileID: 4819147440705896, guid: c789d59c6c93c094ab3a74666ca10f25, type: 2}
   E_MUZZLE_FLASHES:
-  - {fileID: 424018, guid: 1f389bb139e76154582cf3c5e4f9214b, type: 2}
-  - {fileID: 446992, guid: 24bc114e4759e464eab5d9664127a034, type: 2}
-  - {fileID: 453266, guid: 39b2a3d1ecfa5614b97e75a9b5561f21, type: 2}
-  - {fileID: 460582, guid: 8ff371e17619a504b9822fc6a2facdb2, type: 2}
-  - {fileID: 483908, guid: fa6d29df930056640bf15fb9b6a54e4a, type: 2}
-  - {fileID: 410062, guid: 30902f8af10daa04cabd79e9ef258f08, type: 2}
-  - {fileID: 479846, guid: a7730127594a3ad46a512f70521a6446, type: 2}
-  - {fileID: 441106, guid: c69a6f3b834888c468f57ec885c39db3, type: 2}
-  - {fileID: 436518, guid: 35277ee4b65d54d4199c4e0e48053745, type: 2}
-  - {fileID: 461002, guid: 489aba68c9dfe9342accb1f3a0be4e5b, type: 2}
+  - {fileID: 4576552159270088, guid: 65d3df2c3e07f3045bfeba9ee12a4816, type: 2}
   P_SFI_GROUND:
   - {fileID: 475816, guid: e1257e5d18870e940aa885eb59d86429, type: 2}
   - {fileID: 493336, guid: 33b9017c8d7f91a499679ab6535ff9c7, type: 2}
