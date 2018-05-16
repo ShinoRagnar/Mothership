@@ -7,8 +7,8 @@ public class PlayerMovement : MonoBehaviour {
     public float moveSpeed;
     public float jumpForce;
     public float gravityScale;
-    public float fallMultiplier;
-    public float lowFallMultiplier;
+ //   public float fallMultiplier;
+ //   public float lowFallMultiplier;
 
     public bool canMove;
 
@@ -20,8 +20,8 @@ public class PlayerMovement : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        if(fallMultiplier < 1) { fallMultiplier = 2.5f; }
-        if (lowFallMultiplier < 1) { lowFallMultiplier = 4f; }
+      //  if(fallMultiplier < 1) { fallMultiplier = 2.5f; }
+      //  if (lowFallMultiplier < 1) { lowFallMultiplier = 4f; }
         if (moveSpeed == 0) { moveSpeed = 10; }
         if(jumpForce == 0) { jumpForce = 20; }
         if(gravityScale == 0) { gravityScale = 5; }
@@ -60,14 +60,14 @@ public class PlayerMovement : MonoBehaviour {
 
         float yChange = (Physics.gravity.y * gravityScale * Time.deltaTime);
 
-        if (playerController.velocity.y < 0)
+        /*if (playerController.velocity.y < 0)
         {
             yChange = yChange * (fallMultiplier - 1);
         }
         else if (playerController.velocity.y > 0 && !Input.GetButton("Jump"))
         {
             yChange = yChange * (lowFallMultiplier - 1);
-        }
+        }*/
         y += yChange;
 
         playerMoveDirection = new Vector3(x, y, z);

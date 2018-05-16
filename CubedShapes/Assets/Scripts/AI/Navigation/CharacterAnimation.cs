@@ -52,6 +52,9 @@ using System.Collections.Generic;
         private Rigidbody rigid;
         private Animator anim;
         private CapsuleCollider capsule;
+        private Organizer o;
+
+        //Transform muzzle;
 
         public void Awake()
         {
@@ -63,6 +66,8 @@ using System.Collections.Generic;
 
         void Start()
 		{
+            o = Organizer.instance;
+
             rifling = false;
             shooting = false;
 
@@ -75,6 +80,8 @@ using System.Collections.Generic;
             leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
             rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
             rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
+
+            //muzzle = Instantiate(o.P_MUZZLE_FLASHES[0], new Vector3(0, 5, 0), new Quaternion());
         }
 
         public void LookAt(Transform lookTarget)
@@ -122,6 +129,8 @@ using System.Collections.Generic;
         foreach(Gun g in itemEquiper.equipped.Values)
         {
             g.Shoot();
+            //muzzle.gameObject.SetActive(false);
+            //muzzle.gameObject.SetActive(true);
         }
     }
 

@@ -43,13 +43,18 @@ public class Organizer : MonoBehaviour {
     public Transform P_SFI_WALL_LOW_WINDOW;
     public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
 
+
     // Rifles
     public Transform[] P_SFI_RIFLES;
+
+    //Muzzles
+    public Transform[] E_MUZZLE_FLASHES;
 
 
     //low lowdouble window windoudouble
     
-    public Gun GUN_STANDARD_RIFLE;
+    public Gun  GUN_STANDARD_RIFLE;
+    public Item MUZZLE_STANDARD_RIFLE;
 
 
     public Transform[] P_SFI_GROUND;
@@ -62,11 +67,14 @@ public class Organizer : MonoBehaviour {
     private void Awake()
     {
         instance = this;
+        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(-2f, 0f, 0, 0, 180, 0, 0, 0, 0));
         instance.GUN_STANDARD_RIFLE = new Gun(
             "Standard Rifle",
             P_SFI_RIFLES[0],
             new Alignment(0.0988f, 0, 0.03953f, 33.027f, -96.250f, -94.309f, -0.2f, -0.2f, -0.4f),
-            new Vector3(2, 0, 0));
+            new Vector3(2, 0, 0),
+            MUZZLE_STANDARD_RIFLE
+            );
     }
 
 }

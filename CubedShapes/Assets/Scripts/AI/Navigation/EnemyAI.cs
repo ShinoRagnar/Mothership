@@ -35,7 +35,8 @@ public class EnemyAI : MonoBehaviour {
         meshAgent.updateRotation = false;
 
         Gun rifle = o.GUN_STANDARD_RIFLE.Clone();
-        itemEquiper.EquipItem(rifle, anim.GetBoneTransform(HumanBodyBones.RightHand));
+        itemEquiper.EquipItem(rifle);
+        rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
         player = GameObject.Find("Player").transform;
         character.LookAt(player);
