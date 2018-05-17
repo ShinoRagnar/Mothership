@@ -15,10 +15,15 @@ public class ItemEquiper : MonoBehaviour {
         if (i.prefab != null && !i.showing)
         {
             i.visualItem = Instantiate(i.prefab, parent);
-            i.visualItem.position += new Vector3(i.alignment.x, i.alignment.y, i.alignment.z);
             i.visualItem.Rotate(new Vector3(i.alignment.rotX, i.alignment.rotY, i.alignment.rotZ));
+            i.visualItem.position += new Vector3(i.alignment.x, i.alignment.y, i.alignment.z);
             i.visualItem.localScale += new Vector3(i.alignment.scaleX, i.alignment.scaleY, i.alignment.scaleZ);
             i.showing = true;
+            if(i is Gun)
+            {
+                Materialize(((Gun)i).muzzle, i.visualItem);
+                ((Gun)i).muzzle.visualItem.gameObject.SetActive(false);
+            }
         }
     }
 

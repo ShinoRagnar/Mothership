@@ -67,7 +67,10 @@ public class Organizer : MonoBehaviour {
     private void Awake()
     {
         instance = this;
-        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(0, 0, 0, 0, 180, 0, 0, 0, 0));
+        //DestroyImmediate(E_MUZZLE_FLASHES[0].Find("Distortion").gameObject,true);
+
+        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(0.4f, 0, 0.2f, 180, 0, 0, 0, 0, 0));
+       
         instance.GUN_STANDARD_RIFLE = new Gun(
             "Standard Rifle",
             P_SFI_RIFLES[0],

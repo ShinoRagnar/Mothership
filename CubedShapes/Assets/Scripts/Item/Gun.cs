@@ -18,18 +18,8 @@ public class Gun : Item {
     public void Shoot()
     {
         if (showing) {
-            if (!muzzle.showing)
-            {
-                ie.Materialize(muzzle, visualItem);
-               // FPSParticleSystemScaler scaler = muzzle.visualItem.gameObject.AddComponent<FPSParticleSystemScaler>();
-               // scaler.particlesScale = 4f;
-            }
-            else
-            {
-                muzzle.ReEnable();
-            }
+            muzzle.ReEnable();
         }
-        Debug.Log("Shooting");
     }
     public Gun Clone()
     {

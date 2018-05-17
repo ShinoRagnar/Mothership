@@ -9,7 +9,7 @@ public class EnemyAI : MonoBehaviour {
 
     private NavMeshAgent meshAgent;
     private Camera mainCam;
-    private CharacterAnimation character;
+    private Character character;
     private Animator anim;
     private Transform player;
     private ItemEquiper itemEquiper;
@@ -22,7 +22,7 @@ public class EnemyAI : MonoBehaviour {
     // Use this for initialization
     private void Awake()
     {
-        character = GetComponent<CharacterAnimation>();
+        character = GetComponent<Character>();
         meshAgent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         itemEquiper = GetComponent<ItemEquiper>();
@@ -34,11 +34,8 @@ public class EnemyAI : MonoBehaviour {
         mainCam = GameObject.Find("MainCamera").GetComponent<Camera>();
         meshAgent.updateRotation = false;
 
-        Gun rifle = o.GUN_STANDARD_RIFLE.Clone();
-        itemEquiper.EquipItem(rifle);
-        rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
-        //Instantiate(o.E_MUZZLE_FLASHES[3], new Vector3(0, 5, 0), new Quaternion());
+        
 
         player = GameObject.Find("Player").transform;
         character.LookAt(player);
