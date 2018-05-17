@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour {
+public class AIController : MonoBehaviour {
 
-    public static System.Collections.Generic.Dictionary<EnemyAI, Vector3> orders = new System.Collections.Generic.Dictionary<EnemyAI, Vector3>();
+    public static System.Collections.Generic.Dictionary<AIController, Vector3> orders = new System.Collections.Generic.Dictionary<AIController, Vector3>();
 
     private NavMeshAgent meshAgent;
     private Camera mainCam;
@@ -34,8 +34,10 @@ public class EnemyAI : MonoBehaviour {
         mainCam = GameObject.Find("MainCamera").GetComponent<Camera>();
         meshAgent.updateRotation = false;
 
+        Gun rifle = o.GUN_STANDARD_RIFLE.Clone();
+        itemEquiper.EquipItem(rifle);
+        rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
-        
 
         player = GameObject.Find("Player").transform;
         character.LookAt(player);

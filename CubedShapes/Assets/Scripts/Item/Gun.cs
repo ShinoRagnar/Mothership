@@ -15,9 +15,26 @@ public class Gun : Item {
         this.gunpoint = gunp;
         this.muzzle = muzzl;
     }
-    public void Shoot()
+    public void ShootAt(Transform target)
     {
         if (showing) {
+            RaycastHit hit;
+            Vector3 fromPosition = muzzle.visualItem.transform.position;
+            Vector3 toPosition = target.transform.position;
+            Vector3 direction = toPosition - fromPosition;
+
+            // Casts a ray against colliders in the scene
+            if (Physics.Raycast(fromPosition, direction, out hit))
+            {
+                Forge3D.Forcefield ffHit = hit.transform.GetComponentInParent<Forge3D.Forcefield>();
+
+                // Generate random hit power value and call Force Field script if successful
+                if (ffHit != null)
+                {
+                    float hitPower = Random.Range(-2f, 2f);
+                    ffHit.OnHit(hit.point, hitPower);
+                }
+            }
             muzzle.ReEnable();
         }
     }

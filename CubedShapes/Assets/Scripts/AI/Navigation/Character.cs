@@ -82,16 +82,6 @@ public class Character: MonoBehaviour
         rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
 
 
-        Gun rifle = o.GUN_STANDARD_RIFLE.Clone();
-        itemEquiper.EquipItem(rifle);
-        rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
-
-        //muzzle = Instantiate(o.E_MUZZLE_FLASHES[0],anim.GetBoneTransform(HumanBodyBones.RightHand));
-        //muzzle.parent = rifle.visualItem;
-        //muzzle.Rotate(new Vector3(-30, 90, 0));
-        //muzzle.position += new Vector3(0.5f,0,0.2f);
-       
-
     }
 
     public void LookAt(Transform lookTarget)
@@ -105,10 +95,6 @@ public class Character: MonoBehaviour
     }
     public void Move(Vector3 move, bool crouch, bool jump)
     {
-
-        // convert the world relative moveInput vector into a local-relative
-        // turn amount and forward amount required to head in the desired
-        // direction.
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
@@ -136,16 +122,12 @@ public class Character: MonoBehaviour
     }
     public void Bullet()
     {
-
-        
         foreach (Gun g in itemEquiper.equipped.Values)
         {
-            
-           // muzzle.gameObject.SetActive(false);
-           // muzzle.gameObject.SetActive(true);
-
-            g.Shoot();
-            
+            if (lookingAt != null)
+            {
+                g.ShootAt(lookingAt);
+            }
         }
     }
 
