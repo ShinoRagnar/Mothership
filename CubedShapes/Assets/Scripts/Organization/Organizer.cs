@@ -43,6 +43,8 @@ public class Organizer : MonoBehaviour {
     public Transform P_SFI_WALL_LOW_WINDOW;
     public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
 
+    //Ground Tiles
+    public Transform[] P_SFI_GROUND;
 
     // Rifles
     public Transform[] P_SFI_RIFLES;
@@ -50,14 +52,20 @@ public class Organizer : MonoBehaviour {
     //Muzzles
     public Transform[] E_MUZZLE_FLASHES;
 
-
-    //low lowdouble window windoudouble
-    
+    //Guns
     public Gun  GUN_STANDARD_RIFLE;
     public Item MUZZLE_STANDARD_RIFLE;
 
+    //Factions
+    public static Faction FACTION_PLAYER = new Faction("Player Faction");
+    public static Faction FACTION_ENEMY = new Faction("Enemy Faction");
 
-    public Transform[] P_SFI_GROUND;
+    //Soldiers
+    public static Health ENEMY_SOLDIER_STANDARD_HEALTH = new Health(100, 200, 0, 1);
+    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, 100);
+
+
+
 
 
 
@@ -68,9 +76,20 @@ public class Organizer : MonoBehaviour {
     {
         instance = this;
         //DestroyImmediate(E_MUZZLE_FLASHES[0].Find("Distortion").gameObject,true);
+        CreateGameLogicObjects();
+        CreateItems();
 
-        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(0.4f, 0, 0.2f, 180, 0, 0, 0, 0, 0));
+
+    }
+    private void CreateGameLogicObjects()
+    {
        
+    }
+
+    private void CreateItems()
+    {
+        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(0.4f, 0, 0.2f, 180, 0, 0, 0, 0, 0));
+
         instance.GUN_STANDARD_RIFLE = new Gun(
             "Standard Rifle",
             P_SFI_RIFLES[0],
@@ -79,5 +98,4 @@ public class Organizer : MonoBehaviour {
             MUZZLE_STANDARD_RIFLE
             );
     }
-
 }

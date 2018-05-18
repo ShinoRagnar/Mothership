@@ -43,7 +43,7 @@ public class Character: MonoBehaviour
     private Transform leftFoot;
     private Transform rightFoot;
     //Hand IK
-    private Transform rightHand;
+    //private Transform rightHand;
     //Head IK
     private Transform lookingAt;
 
@@ -52,7 +52,7 @@ public class Character: MonoBehaviour
     private Rigidbody rigid;
     private Animator anim;
     private CapsuleCollider capsule;
-    private Organizer o;
+    //private Organizer o;
 
     Transform muzzle;
 
@@ -66,7 +66,7 @@ public class Character: MonoBehaviour
 
     void Start()
     {
-        o = Organizer.instance;
+       // o = Organizer.instance;
 
         rifling = false;
         shooting = false;
@@ -79,7 +79,7 @@ public class Character: MonoBehaviour
 
         leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
         rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
-        rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
+      //  rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
 
 
     }
