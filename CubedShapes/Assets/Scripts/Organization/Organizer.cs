@@ -18,6 +18,8 @@ public class Organizer : MonoBehaviour {
     //Camera
     public static Vector3 CAMERA_DISTANCE = new Vector3(0, 5, -20);
 
+    //Enemy
+    public Transform UNIT_ENEMY_SOLDIER;
 
     // Air Vents
     public Transform P_AIR_BLOCK;
@@ -77,7 +79,7 @@ public class Organizer : MonoBehaviour {
 
     //Soldiers
     public static Health ENEMY_SOLDIER_STANDARD_HEALTH = new Health(100, 200, 0, 1);
-    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, 100);
+    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, 100);
 
     //Player
     public static Health PLAYER_STANDARD_HEALTH = new Health(1000, 2000, 1, 10);

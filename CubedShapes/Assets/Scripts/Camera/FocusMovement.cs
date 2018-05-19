@@ -76,32 +76,32 @@ public class FocusMovement : MonoBehaviour {
 
         if (toTheRightX > 0) {
             outOfBounds = true;
-            moveVector = Vector3.right * (Mathf.Pow(timeOffScreen, 2) * toTheRightX * speed);
+            moveVector += Vector3.right * (Mathf.Pow(timeOffScreen, 2) * toTheRightX * speed);
         } if (toTheLeftX > 0) {
             outOfBounds = true;
-            moveVector = Vector3.left * (Mathf.Pow(timeOffScreen, 2) * toTheLeftX * speed);
+            moveVector += Vector3.left * (Mathf.Pow(timeOffScreen, 2) * toTheLeftX * speed);
         } if (upY > 0) {
             outOfBounds = true;
-            moveVector = Vector3.up * (Mathf.Pow(timeOffScreen, 2) * upY * speed);
+            moveVector += Vector3.up * (Mathf.Pow(timeOffScreen, 2) * upY * speed);
         } if (downY > 0) {
             outOfBounds = true;
-            moveVector = Vector3.down * (Mathf.Pow(timeOffScreen, 2) * downY * speed);
+            moveVector += Vector3.down * (Mathf.Pow(timeOffScreen, 2) * downY * speed);
         }
         if (innerFocusDownY > 0){
             outOfFocusBounds = true;
-            moveVector = Vector3.down * (Time.deltaTime * innerFocusDownY * speed);
+            moveVector += Vector3.down * (Time.deltaTime * innerFocusDownY * speed);
         }if (innerFocusUpY > 0)
         {
             outOfFocusBounds = true;
-            moveVector = Vector3.up * (Time.deltaTime * innerFocusUpY * speed);
+            moveVector += Vector3.up * (Time.deltaTime * innerFocusUpY * speed);
         }if (innerFocusToTheLeftX > 0)
         {
             outOfFocusBounds = true;
-            moveVector = Vector3.left * (Time.deltaTime * innerFocusToTheLeftX * speed);
+            moveVector += Vector3.left * (Time.deltaTime * innerFocusToTheLeftX * speed);
         }if (innerFocusToTheRightX > 0)
         {
             outOfFocusBounds = true;
-            moveVector = Vector3.right * (Time.deltaTime * innerFocusToTheRightX * speed);
+            moveVector += Vector3.right * (Time.deltaTime * innerFocusToTheRightX * speed);
         }
 
         if (outOfBounds)

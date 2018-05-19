@@ -22,7 +22,7 @@ public class GameUnit{
         {
             activeUnits[unitName]++;
         }
-        else { activeUnits.Add(unitName, 1); }
+        else { activeUnits.Add(unitName, 0); }
         uniqueName = unitName + activeUnits[unitName];
     }
 
