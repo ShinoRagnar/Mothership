@@ -67,6 +67,11 @@ public class PlayerSpawner : MonoBehaviour {
         playerShield.parent = playerBody;
         ColliderOwner coShield = playerShield.gameObject.AddComponent<ColliderOwner>();
         coShield.owner = player;
+
+        //Layer
+        Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_PLAYER, playerNode.gameObject);
+        Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_SHIELDS, playerShield.gameObject);
+
         
     }
 }

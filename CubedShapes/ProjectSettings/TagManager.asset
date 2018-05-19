@@ -14,11 +14,11 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - AI Agents
+  - Enemy
   - Player
   - Shields
-  - 
-  - 
+  - Ground
+  - No Interaction
   - 
   - 
   - 

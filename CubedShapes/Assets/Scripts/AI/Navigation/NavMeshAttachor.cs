@@ -17,7 +17,7 @@ public class NavMeshAttachor : MonoBehaviour {
     private static string LINK_LEFT              = LINK + LEFT;
     private static string LINK_RIGHT             = LINK + RIGHT;
     private static float  LINK_EDGE_DISTANCE     = 0.2f;
-    private static float  LINK_JUMP_DISTANCE_X   = 2;
+    private static float  LINK_JUMP_DISTANCE_X   = 5;
 
     // Use this for initialization
     void Start () {
@@ -128,6 +128,7 @@ public class NavMeshAttachor : MonoBehaviour {
                             , Mathf.Infinity))
         {
             go = new GameObject(hit.transform.gameObject.name + DROP + from.name);
+            go.transform.parent = from.transform;
             go.transform.position = new Vector3(from.transform.position.x + xShift,
                                                 from.transform.position.y - hit.distance,
                                                 from.transform.position.z);

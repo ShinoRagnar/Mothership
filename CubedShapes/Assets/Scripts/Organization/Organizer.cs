@@ -14,6 +14,14 @@ public class Organizer : MonoBehaviour {
     //String parts
     public static string NAME_SHIELD = " Shield";
     public static string NAME_BODY = " Body";
+    //Layers
+    public static string LAYER_SHIELDS = "Shields";
+    public static string LAYER_GROUND = "Ground";
+    public static string LAYER_PLAYER = "Player";
+    public static string LAYER_ENEMY = "Enemy";
+    public static string LAYER_NO_INTERACTION = "No Interaction";
+
+
 
     //Camera
     public static Vector3 CAMERA_DISTANCE = new Vector3(0, 5, -20);
@@ -91,6 +99,16 @@ public class Organizer : MonoBehaviour {
 
 
     private System.Collections.Generic.Dictionary<string, Transform> prefabs;
+
+    public static void SetLayerOfThisAndChildren(string layer, GameObject go)
+    {
+        go.layer = LayerMask.NameToLayer(layer);
+        foreach(Transform child in go.transform)
+        {
+            SetLayerOfThisAndChildren(layer, child.gameObject);
+        }
+    }
+
 
     private void Awake()
     {
