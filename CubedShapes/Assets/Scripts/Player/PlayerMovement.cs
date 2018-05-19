@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour {
 
     private CharacterController playerController;
     private Vector3 playerMoveDirection;
+    private Transform player;
 
 
 
@@ -29,6 +30,7 @@ public class PlayerMovement : MonoBehaviour {
         canMove = true;
         playerController = GetComponent<CharacterController>();
         //playerBody = GetComponent<Rigidbody>();
+        //playerController.Move(new Vector3(1,0));
 	}
 
 
@@ -41,7 +43,7 @@ public class PlayerMovement : MonoBehaviour {
 
         x = 0f;
         y = playerMoveDirection.y;
-        z = 0f;
+        z = 0f; //player.position.z;
 
         float heading = Input.GetAxis("Horizontal");
 

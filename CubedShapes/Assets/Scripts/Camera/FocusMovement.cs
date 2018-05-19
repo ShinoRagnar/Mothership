@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class FocusMovement : MonoBehaviour {
 
-    public Transform playerPlane;
+    //Tracking
+    public Transform playerBody;
+
     public float speed;
+
     public bool visible;
 
     // turn to private after testing
@@ -24,9 +27,14 @@ public class FocusMovement : MonoBehaviour {
 
     private Renderer rend;
 
+
     // Use this for initialization
     void Start()
     {
+        if(speed <= 0)
+        {
+            speed = 1;
+        }
         rend = GetComponent<Renderer>();
         timeOffScreen = 0;
         if (!visible)
@@ -38,62 +46,62 @@ public class FocusMovement : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-
         bool outOfBounds = false;
         bool outOfFocusBounds = false;
 
         float width = transform.localScale.x;
         float height = transform.localScale.y;
-        float playerWidth = playerPlane.transform.localScale.x;
-        float playerHeight = playerPlane.transform.localScale.y;
+        float playerWidth = playerBody.transform.localScale.x;
+        float playerHeight = playerBody.transform.localScale.y;
 
-        toTheRightX = (playerPlane.position.x - (playerWidth / 2))
+        toTheRightX = (playerBody.position.x - (playerWidth / 2))
                         - (transform.position.x + (width / 2));
         toTheLeftX = (transform.position.x - (width / 2)) -
-                      (playerPlane.position.x + (playerWidth / 2));
-        upY = (playerPlane.position.y - (playerHeight / 2))
+                      (playerBody.position.x + (playerWidth / 2));
+        upY = (playerBody.position.y - (playerHeight / 2))
                         - (transform.position.y + (height / 2));
         downY = (transform.position.y - (height / 2)) -
-                      (playerPlane.position.y + (playerHeight / 2));
+                      (playerBody.position.y + (playerHeight / 2));
 
-        innerFocusToTheRightX = (playerPlane.position.x - (playerWidth / 2))
+        innerFocusToTheRightX = (playerBody.position.x - (playerWidth / 2))
                         - (transform.position.x + (playerWidth / 2));
         innerFocusToTheLeftX = (transform.position.x - (playerWidth / 2)) -
-                      (playerPlane.position.x + (playerWidth / 2));
-        innerFocusUpY = (playerPlane.position.y - (playerHeight / 2))
+                      (playerBody.position.x + (playerWidth / 2));
+        innerFocusUpY = (playerBody.position.y - (playerHeight / 2))
                         - (transform.position.y + (playerHeight / 2));
         innerFocusDownY = (transform.position.y - (playerHeight / 2)) -
-                      (playerPlane.position.y + (playerHeight / 2));
+                      (playerBody.position.y + (playerHeight / 2));
 
+        Vector3 moveVector = Vector3.zero;
 
         if (toTheRightX > 0) {
             outOfBounds = true;
-            transform.Translate(Vector3.right * (Mathf.Pow(timeOffScreen, 2) * toTheRightX * speed));
+            moveVector = Vector3.right * (Mathf.Pow(timeOffScreen, 2) * toTheRightX * speed);
         } if (toTheLeftX > 0) {
             outOfBounds = true;
-            transform.Translate(Vector3.left * (Mathf.Pow(timeOffScreen, 2) * toTheLeftX * speed));
+            moveVector = Vector3.left * (Mathf.Pow(timeOffScreen, 2) * toTheLeftX * speed);
         } if (upY > 0) {
             outOfBounds = true;
-            transform.Translate(Vector3.up * (Mathf.Pow(timeOffScreen, 2) * upY * speed));
+            moveVector = Vector3.up * (Mathf.Pow(timeOffScreen, 2) * upY * speed);
         } if (downY > 0) {
             outOfBounds = true;
-            transform.Translate(Vector3.down * (Mathf.Pow(timeOffScreen, 2) * downY * speed));
+            moveVector = Vector3.down * (Mathf.Pow(timeOffScreen, 2) * downY * speed);
         }
         if (innerFocusDownY > 0){
             outOfFocusBounds = true;
-            transform.Translate(Vector3.down * (Time.deltaTime * innerFocusDownY * speed));
+            moveVector = Vector3.down * (Time.deltaTime * innerFocusDownY * speed);
         }if (innerFocusUpY > 0)
         {
             outOfFocusBounds = true;
-            transform.Translate(Vector3.up * (Time.deltaTime * innerFocusUpY * speed));
+            moveVector = Vector3.up * (Time.deltaTime * innerFocusUpY * speed);
         }if (innerFocusToTheLeftX > 0)
         {
             outOfFocusBounds = true;
-            transform.Translate(Vector3.left * (Time.deltaTime * innerFocusToTheLeftX * speed));
+            moveVector = Vector3.left * (Time.deltaTime * innerFocusToTheLeftX * speed);
         }if (innerFocusToTheRightX > 0)
         {
             outOfFocusBounds = true;
-            transform.Translate(Vector3.right * (Time.deltaTime * innerFocusToTheRightX * speed));
+            moveVector = Vector3.right * (Time.deltaTime * innerFocusToTheRightX * speed);
         }
 
         if (outOfBounds)
@@ -110,7 +118,8 @@ public class FocusMovement : MonoBehaviour {
             }
             timeOffScreen = 0;
         }
-
+        this.transform.Translate(moveVector);
+        //Debug.Log(moveVector);
         //transform.position = playerPlane.position - offset;
     }
     void setGreen() {

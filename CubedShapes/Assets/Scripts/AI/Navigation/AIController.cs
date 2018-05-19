@@ -39,8 +39,8 @@ public class AIController : MonoBehaviour {
         rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
 
-        player = GameObject.Find("Player").transform;
-        character.LookAt(player);
+        //player = GameObject.Find("Player").transform;
+        //character.LookAt(player);
 
 	}
 	

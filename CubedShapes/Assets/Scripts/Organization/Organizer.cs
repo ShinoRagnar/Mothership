@@ -4,8 +4,20 @@ using UnityEngine;
 
 public class Organizer : MonoBehaviour {
 
-
+    //SELF
     public static Organizer instance;
+
+    //GameObjects
+    public static string NAME_MAIN_CAMERA = "MainCamera";
+    public static string NAME_MAIN_FOCUS = "CameraFocus";
+    public static string NAME_PLAYER_GAMEOBJECT = "Player";
+    //String parts
+    public static string NAME_SHIELD = " Shield";
+    public static string NAME_BODY = " Body";
+
+    //Camera
+    public static Vector3 CAMERA_DISTANCE = new Vector3(0, 5, -20);
+
 
     // Air Vents
     public Transform P_AIR_BLOCK;
@@ -46,6 +58,9 @@ public class Organizer : MonoBehaviour {
     //Ground Tiles
     public Transform[] P_SFI_GROUND;
 
+    //Shield
+    public Transform P_FORCE_SHIELD;
+
     // Rifles
     public Transform[] P_SFI_RIFLES;
 
@@ -64,6 +79,9 @@ public class Organizer : MonoBehaviour {
     public static Health ENEMY_SOLDIER_STANDARD_HEALTH = new Health(100, 200, 0, 1);
     public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, 100);
 
+    //Player
+    public static Health PLAYER_STANDARD_HEALTH = new Health(1000, 2000, 1, 10);
+    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, 1000);
 
 
 
