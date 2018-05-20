@@ -7,15 +7,9 @@ public class CameraMovement : MonoBehaviour {
     public Transform target;
     public Vector3 offset;
 
-	// Use this for initialization
-	void Start () {
-        offset = target.position - transform.position;
-	}
-	
 	// Update is called once per frame
-	void Update () {
-        transform.position = target.position - offset;
-
+	void Update () {   
+        transform.position = target.position + Organizer.CAMERA_DISTANCE;
         transform.LookAt(target);
 	}
 }

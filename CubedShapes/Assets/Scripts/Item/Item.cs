@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Item {
 
+    public ArrayList subItems = new ArrayList();
 
     public Transform visualItem;
     public bool showing;
@@ -22,7 +23,12 @@ public class Item {
     }
     public void AddEquipper(ItemEquiper iteme)
     {
+        //Debug.Log("Adding equipper to:" + itemName);
         ie = iteme;
+        foreach(Item child in subItems)
+        {
+            child.ie = iteme;
+        }
     }
 
     public void Show(Transform parent)
@@ -37,13 +43,42 @@ public class Item {
     {
         return alignment;
     }
-
-	public void ReEnable()
+    public Item Clone()
+    {
+        return new Item(itemName, prefab, alignment);
+    }
+    public void Enable()
+    {
+        if (showing)
+        {
+            visualItem.gameObject.SetActive(true);
+        }
+        foreach (Item i in subItems)
+        {
+            i.Enable();
+        }
+    }
+    public void Disable()
+    {
+        if (showing)
+        {
+            visualItem.gameObject.SetActive(false);
+        }
+        foreach (Item i in subItems)
+        {
+            i.Disable();
+        }
+    }
+    public void ReEnable()
     {
         if(showing)
         {
             visualItem.gameObject.SetActive(false);
             visualItem.gameObject.SetActive(true);
+        }
+        foreach (Item i in subItems)
+        {
+            i.ReEnable();
         }
     }
 }

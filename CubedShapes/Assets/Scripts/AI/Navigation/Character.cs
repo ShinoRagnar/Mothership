@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
@@ -25,12 +26,13 @@ public class Character: MonoBehaviour
     float m_CapsuleHeight;
     Vector3 m_CapsuleCenter;
 
-    bool m_Crouching;
+    
 
     // Animation states
     public bool rifling;
     public bool shooting;
     public bool equipped;
+    public bool crouching;
 
     //Head IK
     private float lookIKWeight;
@@ -52,16 +54,33 @@ public class Character: MonoBehaviour
     private Rigidbody rigid;
     private Animator anim;
     private CapsuleCollider capsule;
-    //private Organizer o;
+    private NavMeshAgent navAgent;
+    private CharacterLinkMover linkMover;
 
-    Transform muzzle;
 
     public void Awake()
     {
         itemEquiper = GetComponent<ItemEquiper>();
+        itemEquiper.equippedCharacter = this;
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
+        navAgent = GetComponent<NavMeshAgent>();
+        // Used for jumping
+        linkMover = this.gameObject.AddComponent<CharacterLinkMover>();
+    }
+    public void UpdateWithEquippedItems()
+    {
+        foreach (Item j in itemEquiper.equipped.Values)
+        {
+            if(j is JetPack)
+            {
+                linkMover.characterJetpack = (JetPack)j;
+                break;
+            }
+
+            
+        }
     }
 
     void Start()
@@ -79,7 +98,9 @@ public class Character: MonoBehaviour
 
         leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
         rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
-      //  rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
+        //  rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
+
+
 
 
     }
@@ -136,10 +157,10 @@ public class Character: MonoBehaviour
     {
         if (m_IsGrounded && crouch)
         {
-            if (m_Crouching) return;
+            if (crouching) return;
             capsule.height = capsule.height / 2f;
             capsule.center = capsule.center / 2f;
-            m_Crouching = true;
+            crouching = true;
         }
         else
         {
@@ -147,25 +168,25 @@ public class Character: MonoBehaviour
             float crouchRayLength = m_CapsuleHeight - capsule.radius * k_Half;
             if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
-                m_Crouching = true;
+                crouching = true;
                 return;
             }
             capsule.height = m_CapsuleHeight;
             capsule.center = m_CapsuleCenter;
-            m_Crouching = false;
+            crouching = false;
         }
     }
 
     void PreventStandingInLowHeadroom()
     {
         // prevent standing up in crouch-only zones
-        if (!m_Crouching)
+        if (!crouching)
         {
             Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
             float crouchRayLength = m_CapsuleHeight - capsule.radius * k_Half;
             if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
-                m_Crouching = true;
+                crouching = true;
             }
         }
     }
@@ -210,7 +231,7 @@ public class Character: MonoBehaviour
         // update the animator parameters
         anim.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
         anim.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
-        anim.SetBool("Crouch", m_Crouching);
+        anim.SetBool("Crouch", crouching);
         anim.SetBool("OnGround", m_IsGrounded);
         anim.SetBool("Rifling", rifling);
         anim.SetBool("Shooting", shooting);
@@ -249,6 +270,7 @@ public class Character: MonoBehaviour
     void HandleAirborneMovement()
     {
         // apply extra gravity from multiplier:
+        
         Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
         rigid.AddForce(extraGravityForce);
 
@@ -294,21 +316,22 @@ public class Character: MonoBehaviour
 
     void CheckGroundStatus()
     {
-        RaycastHit hitInfo;
-#if UNITY_EDITOR
-        // helper to visualise the ground check ray in the scene view
-        Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * m_GroundCheckDistance));
-#endif
-        // 0.1f is a small offset to start the ray from inside the character
-        // it is also good to note that the transform position in the sample assets is at the base of the character
-        if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
+        if (!navAgent.isOnOffMeshLink)
         {
-            m_GroundNormal = hitInfo.normal;
+            
+
             m_IsGrounded = true;
             anim.applyRootMotion = true;
-        }
-        else
-        {
+            RaycastHit hitInfo;
+            int layer_mask = LayerMask.GetMask(Organizer.LAYER_GROUND);
+
+            if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, Mathf.Infinity, layer_mask))
+            {
+                m_GroundNormal = hitInfo.normal;
+            }
+
+        }else{
+            
             m_IsGrounded = false;
             m_GroundNormal = Vector3.up;
             anim.applyRootMotion = false;

@@ -53,13 +53,8 @@ public class PlayerSpawner : MonoBehaviour {
 
         //Camera
         cam = GameObject.Find(Organizer.NAME_MAIN_CAMERA).GetComponent<Camera>();
-        cam.gameObject.transform.position = new Vector3(
-                    this.transform.position.x + Organizer.CAMERA_DISTANCE.x, 
-                    this.transform.position.y + Organizer.CAMERA_DISTANCE.y, 
-                    this.transform.position.z + Organizer.CAMERA_DISTANCE.z);
         cam.GetComponent<CameraMovement>().target = focus.transform;
-        
- 
+
         //Shield
         playerShield = Instantiate(o.P_FORCE_SHIELD, playerBody);
         playerShield.name = Organizer.NAME_PLAYER_GAMEOBJECT + Organizer.NAME_SHIELD;

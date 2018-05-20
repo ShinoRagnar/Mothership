@@ -38,11 +38,28 @@ public class AIController : MonoBehaviour {
         itemEquiper.EquipItem(rifle);
         rifle.Show(anim.GetBoneTransform(HumanBodyBones.RightHand));
 
+        JetPack jet = o.JETPACK_STANDARD.Clone();
+        itemEquiper.EquipItem(jet);
+        jet.Show(anim.GetBoneTransform(HumanBodyBones.UpperChest));
+
+        /*
+        Item jetBeamerLeft = o.JET_BEAMER_STANDARD_LEFT.Clone();
+        Item jetBeamerRight = o.JET_BEAMER_STANDARD_RIGHT.Clone();
+        itemEquiper.EquipItem(jetBeamerLeft);
+        itemEquiper.EquipItem(jetBeamerRight);
+        jetBeamerLeft.Show(anim.GetBoneTransform(HumanBodyBones.UpperChest));
+        jetBeamerRight.Show(anim.GetBoneTransform(HumanBodyBones.UpperChest));
+        */
+
+        /*Visor vis = o.STANDARD_SOLDIER_VISOR.Clone();
+        itemEquiper.EquipItem(vis);
+        vis.Show(anim.GetBoneTransform(HumanBodyBones.Head));
+        */
 
         //player = GameObject.Find("Player").transform;
         //character.LookAt(player);
 
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {

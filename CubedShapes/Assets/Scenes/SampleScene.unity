@@ -692,7 +692,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 398847560}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1.76, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 843989391}
@@ -1077,7 +1077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52f6b9038996d4b46abbe707281f1528, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UNIT_ENEMY_SOLDIER: {fileID: 4641373666850054, guid: e45ecc4aea2c53c4ab947ed3bc2f5a17,
+  UNIT_ENEMY_SOLDIER: {fileID: 4318408460668504, guid: e45ecc4aea2c53c4ab947ed3bc2f5a17,
     type: 2}
   P_AIR_BLOCK: {fileID: 488288, guid: 692d7c5cba444f44fb974fc53e636a4b, type: 2}
   P_AIR_CABLE: {fileID: 448398, guid: 4de89582137059a4596087e274391b13, type: 2}
@@ -1157,6 +1157,12 @@ MonoBehaviour:
   - {fileID: 4819147440705896, guid: c789d59c6c93c094ab3a74666ca10f25, type: 2}
   E_MUZZLE_FLASHES:
   - {fileID: 424018, guid: 1f389bb139e76154582cf3c5e4f9214b, type: 2}
+  E_JET_BEAMS:
+  - {fileID: 406634, guid: ea40af0b103306e45a6107ade5419c3a, type: 2}
+  - {fileID: 410312, guid: 9360b622a27b1e643ba281d7c3e98e30, type: 2}
+  - {fileID: 412078, guid: 9ab2c952c80e643438b3b26c5f3e6c12, type: 2}
+  - {fileID: 474686, guid: c18aa264f8b97f2478bb2c13d6e52cde, type: 2}
+  - {fileID: 465776, guid: e7e16ca4a802f3746a820d90f9f8f8e7, type: 2}
 --- !u!4 &851111121 stripped
 Transform:
   m_PrefabParentObject: {fileID: 440718, guid: 6488b6e6bbe8a9c4585b531a71d8211c, type: 2}

@@ -38,9 +38,9 @@ public class Gun : Item {
             muzzle.ReEnable();
         }
     }
-    public Gun Clone()
+    public new Gun Clone()
     {
-        return new Gun(itemName, prefab, alignment, gunpoint, new Item(muzzle.itemName,muzzle.prefab,muzzle.alignment));
+        return new Gun(itemName, prefab, alignment, gunpoint, muzzle.Clone());//new Item(muzzle.itemName,muzzle.prefab,muzzle.alignment));
     }
 
 }

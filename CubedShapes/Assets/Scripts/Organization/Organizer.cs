@@ -6,7 +6,10 @@ public class Organizer : MonoBehaviour {
 
     //SELF
     public static Organizer instance;
+    //Camera
+    public static Vector3 CAMERA_DISTANCE = new Vector3(0, 5, -20);
 
+    // ---------------------- STRINGS
     //GameObjects
     public static string NAME_MAIN_CAMERA = "MainCamera";
     public static string NAME_MAIN_FOCUS = "CameraFocus";
@@ -21,11 +24,7 @@ public class Organizer : MonoBehaviour {
     public static string LAYER_ENEMY = "Enemy";
     public static string LAYER_NO_INTERACTION = "No Interaction";
 
-
-
-    //Camera
-    public static Vector3 CAMERA_DISTANCE = new Vector3(0, 5, -20);
-
+    // ---------------------- PREFAB
     //Enemy
     public Transform UNIT_ENEMY_SOLDIER;
 
@@ -65,6 +64,11 @@ public class Organizer : MonoBehaviour {
     public Transform P_SFI_WALL_LOW_WINDOW;
     public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
 
+    //Visor
+    //public Transform P_VISOR_STANDARD_ORANGE;
+
+
+
     //Ground Tiles
     public Transform[] P_SFI_GROUND;
 
@@ -74,12 +78,28 @@ public class Organizer : MonoBehaviour {
     // Rifles
     public Transform[] P_SFI_RIFLES;
 
+
+    // ---------------------- EFFECTS
     //Muzzles
     public Transform[] E_MUZZLE_FLASHES;
+
+    //Jet beams
+    public Transform[] E_JET_BEAMS;
+
+
+    // ----------------------- MISC
+    //Beams 
+    public Item JET_BEAMER_STANDARD_LEFT;
+    public Item JET_BEAMER_STANDARD_RIGHT;
+    public JetPack JETPACK_STANDARD;
 
     //Guns
     public Gun  GUN_STANDARD_RIFLE;
     public Item MUZZLE_STANDARD_RIFLE;
+
+    //Visors
+    //public Visor STANDARD_SOLDIER_VISOR;
+
 
     //Factions
     public static Faction FACTION_PLAYER = new Faction("Player Faction");
@@ -135,5 +155,11 @@ public class Organizer : MonoBehaviour {
             new Vector3(2, 0, 0),
             MUZZLE_STANDARD_RIFLE
             );
+        instance.JET_BEAMER_STANDARD_LEFT = new Item("Jet Beamer Soldier Standard Left", E_JET_BEAMS[1], new Alignment(-0.1f, 0, -0.2f, 171.32f, -116.13f, -84.89f, -0.6f, -0.6f, -0.4f));
+        instance.JET_BEAMER_STANDARD_RIGHT = new Item("Jet Beamer Soldier Standard Right", E_JET_BEAMS[1], new Alignment(0.1f, 0, -0.2f, -5, 121, 11, -0.6f, -0.6f, -0.4f));
+        JETPACK_STANDARD = new JetPack("Jetpack Soldier Standard", instance.JET_BEAMER_STANDARD_LEFT, instance.JET_BEAMER_STANDARD_RIGHT);
+
+        //instance.STANDARD_SOLDIER_VISOR = new Visor("Standard Visor Orange", P_VISOR_STANDARD_ORANGE, new Alignment(0, 0, 0, 90, 0, 0, 0, 0, 0));
+
     }
 }

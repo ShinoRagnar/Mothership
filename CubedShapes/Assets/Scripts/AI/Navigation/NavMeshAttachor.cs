@@ -16,7 +16,7 @@ public class NavMeshAttachor : MonoBehaviour {
     private static string DROP                   = "Drop";
     private static string LINK_LEFT              = LINK + LEFT;
     private static string LINK_RIGHT             = LINK + RIGHT;
-    private static float  LINK_EDGE_DISTANCE     = 0.2f;
+    private static float  LINK_EDGE_DISTANCE     = 0.7f;
     private static float  LINK_JUMP_DISTANCE_X   = 5;
 
     // Use this for initialization
@@ -62,7 +62,7 @@ public class NavMeshAttachor : MonoBehaviour {
                             string leftLinkName = leftLink.name + " to " + compRightLink.name;
                             string rightLinkName = rightLink.name + " to " + compLeftLink.name;
 
-                            if (!added.ContainsKey(leftLinkName)
+                            if (!leftLinkFound //!added.ContainsKey(leftLinkName)
                                     &&
                                     compLeftLink.transform.position.x < leftLink.transform.position.x
                                     &&
@@ -78,7 +78,7 @@ public class NavMeshAttachor : MonoBehaviour {
                                     leftLinkFound = true;
                                 }
                             }
-                            if (!added.ContainsKey(rightLinkName)
+                            if (!rightLinkFound //!added.ContainsKey(rightLinkName)
                                     &&
                                     compLeftLink.transform.position.x - LINK_JUMP_DISTANCE_X < rightLink.transform.position.x
                                     &&
@@ -122,10 +122,13 @@ public class NavMeshAttachor : MonoBehaviour {
     {
         GameObject go = null;
         RaycastHit hit;
+        int layer_mask = LayerMask.GetMask(Organizer.LAYER_GROUND);
         if (Physics.Raycast(new Vector3(from.transform.position.x + xShift, from.transform.position.y, from.transform.position.z)
                             , transform.TransformDirection(Vector3.down)
                             , out hit
-                            , Mathf.Infinity))
+                            , Mathf.Infinity
+                            , layer_mask
+                            ))
         {
             go = new GameObject(hit.transform.gameObject.name + DROP + from.name);
             go.transform.parent = from.transform;
@@ -146,7 +149,7 @@ public class NavMeshAttachor : MonoBehaviour {
         NavMeshLink navLink = mid.AddComponent<NavMeshLink>();
         navLink.startPoint = new Vector3((from.position.x - to.position.x) / 2, (from.position.y - to.position.y) / 2, 0); //leftLink.transform.position;
         navLink.endPoint = new Vector3(-(from.position.x - to.position.x) / 2, -(from.position.y - to.position.y) / 2, 0);
-
+        navLink.width = Mathf.Min(from.localScale.z, to.localScale.z);
         return mid;
     }
  
