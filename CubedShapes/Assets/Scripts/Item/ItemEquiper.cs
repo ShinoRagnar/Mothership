@@ -32,12 +32,10 @@ public class ItemEquiper : MonoBehaviour {
 
     public void EquipItem(Item i)
     {
-        //Debug.Log("Equipping:"+i.itemName);
         equipped.Add(i.itemName, i);
         i.AddEquipper(this);
         if(equippedCharacter != null)
         {
-            Debug.Log("Updating");
             equippedCharacter.UpdateWithEquippedItems();
         }
     }

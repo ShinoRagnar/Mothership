@@ -11,9 +11,23 @@ public class Faction{
     public Faction(string name)
     {
         this.factionName = name;
+        hostileFactions = new System.Collections.Generic.Dictionary<string, Faction>();
+        alliedFactions = new System.Collections.Generic.Dictionary<string, Faction>();
+        GameUnit.unitsByFaction.Add(this, new ArrayList());
+
+    }
+    public Faction(string name, Faction hostileTo)
+    {
+        this.factionName = name;
+        hostileFactions = new System.Collections.Generic.Dictionary<string, Faction>();
+        alliedFactions = new System.Collections.Generic.Dictionary<string, Faction>();
+        GameUnit.unitsByFaction.Add(this, new ArrayList());
+
+        SetHostileTo(hostileTo);
     }
     public void SetHostileTo(Faction f)
     {
+        Debug.Log("These factions are now hostile: "+this.factionName + " " + f.factionName);
         SetHostile(f);
         f.SetHostile(this);
     }

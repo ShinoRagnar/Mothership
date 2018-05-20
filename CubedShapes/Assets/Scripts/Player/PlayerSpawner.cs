@@ -28,17 +28,18 @@ public class PlayerSpawner : MonoBehaviour {
         
 
         //Player Placeholder
-        GameObject play = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        play.name = Organizer.NAME_PLAYER_GAMEOBJECT+Organizer.NAME_BODY;
-        playerBody = play.transform;
+        GameObject body = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        body.name = Organizer.NAME_PLAYER_GAMEOBJECT+Organizer.NAME_BODY;
+        playerBody = body.transform;
         playerBody.parent = playerNode;
         playerBody.position = this.transform.position;
         playerBody.localScale += new Vector3(1, 1, 1);
-        play.AddComponent<PlayerMovement>();
-        play.AddComponent<CharacterController>();
-        play.AddComponent<NavMeshObstacle>();
-        ColliderOwner coPlay = play.AddComponent<ColliderOwner>();
+        body.AddComponent<PlayerMovement>();
+        body.AddComponent<CharacterController>();
+        body.AddComponent<NavMeshObstacle>();
+        ColliderOwner coPlay = body.AddComponent<ColliderOwner>();
         coPlay.owner = player;
+        player.body = playerBody;
 
         //Focus
         GameObject focus = GameObject.CreatePrimitive(PrimitiveType.Cube);

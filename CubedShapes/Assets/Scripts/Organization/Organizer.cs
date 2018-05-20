@@ -100,18 +100,21 @@ public class Organizer : MonoBehaviour {
     //Visors
     //public Visor STANDARD_SOLDIER_VISOR;
 
+    //Senses
+    public static Senses STANDARD_HUMANOID_SENSES = new Senses(100, 20, 15, 15, 1);
+    public static Senses STANDARD_ROBOT_SENSES = new Senses(100, 100, 100, 100, 1);
 
     //Factions
     public static Faction FACTION_PLAYER = new Faction("Player Faction");
-    public static Faction FACTION_ENEMY = new Faction("Enemy Faction");
+    public static Faction FACTION_ENEMY = new Faction("Enemy Faction", FACTION_PLAYER);
 
     //Soldiers
     public static Health ENEMY_SOLDIER_STANDARD_HEALTH = new Health(100, 200, 0, 1);
-    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, 100);
+    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, STANDARD_HUMANOID_SENSES, 100);
 
     //Player
     public static Health PLAYER_STANDARD_HEALTH = new Health(1000, 2000, 1, 10);
-    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, 1000);
+    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, STANDARD_ROBOT_SENSES, 1000);
 
 
 
@@ -157,7 +160,7 @@ public class Organizer : MonoBehaviour {
             );
         instance.JET_BEAMER_STANDARD_LEFT = new Item("Jet Beamer Soldier Standard Left", E_JET_BEAMS[1], new Alignment(-0.1f, 0, -0.2f, 171.32f, -116.13f, -84.89f, -0.6f, -0.6f, -0.4f));
         instance.JET_BEAMER_STANDARD_RIGHT = new Item("Jet Beamer Soldier Standard Right", E_JET_BEAMS[1], new Alignment(0.1f, 0, -0.2f, -5, 121, 11, -0.6f, -0.6f, -0.4f));
-        JETPACK_STANDARD = new JetPack("Jetpack Soldier Standard", instance.JET_BEAMER_STANDARD_LEFT, instance.JET_BEAMER_STANDARD_RIGHT);
+        instance.JETPACK_STANDARD = new JetPack("Jetpack Soldier Standard", instance.JET_BEAMER_STANDARD_LEFT, instance.JET_BEAMER_STANDARD_RIGHT);
 
         //instance.STANDARD_SOLDIER_VISOR = new Visor("Standard Visor Orange", P_VISOR_STANDARD_ORANGE, new Alignment(0, 0, 0, 90, 0, 0, 0, 0, 0));
 

@@ -31,6 +31,7 @@ public class EnemySpawner : MonoBehaviour {
         enemyBody.gameObject.name = enemy.uniqueName;
         ColliderOwner co = enemyBody.gameObject.AddComponent<ColliderOwner>();
         co.owner = enemy;
+        enemy.body = enemyBody;
 
         //Shield
         Transform enemyShield = Instantiate(o.P_FORCE_SHIELD, enemyBody);

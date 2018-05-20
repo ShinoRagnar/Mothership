@@ -143,11 +143,14 @@ public class Character: MonoBehaviour
     }
     public void Bullet()
     {
-        foreach (Gun g in itemEquiper.equipped.Values)
+        foreach (Item g in itemEquiper.equipped.Values)
         {
-            if (lookingAt != null)
+            if (g is Gun)
             {
-                g.ShootAt(lookingAt);
+                if (lookingAt != null)
+                {
+                    ((Gun)g).ShootAt(lookingAt);
+                }
             }
         }
     }

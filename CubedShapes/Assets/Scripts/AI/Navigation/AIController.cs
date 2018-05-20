@@ -3,21 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum AIMode
+{
+    Scouting,
+    Hunting
+}
 public class AIController : MonoBehaviour {
 
     public static System.Collections.Generic.Dictionary<AIController, Vector3> orders = new System.Collections.Generic.Dictionary<AIController, Vector3>();
+
+
 
     private NavMeshAgent meshAgent;
     private Camera mainCam;
     private Character character;
     private Animator anim;
-    private Transform player;
     private ItemEquiper itemEquiper;
-
-    bool rifling;
-    bool shooting;
-
+    private GameUnit self;
     private Organizer o;
+
+    //AI
+    AIMode currentMode;
+    public GameUnit huntingTarget;
+    private float reactionCycle = 0;
+
 
     // Use this for initialization
     private void Awake()
@@ -26,10 +35,13 @@ public class AIController : MonoBehaviour {
         meshAgent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         itemEquiper = GetComponent<ItemEquiper>();
+
     }
 
     void Start () {
         o = Organizer.instance;
+
+        self = GetComponent<ColliderOwner>().owner;
 
         mainCam = GameObject.Find("MainCamera").GetComponent<Camera>();
         meshAgent.updateRotation = false;
@@ -42,67 +54,77 @@ public class AIController : MonoBehaviour {
         itemEquiper.EquipItem(jet);
         jet.Show(anim.GetBoneTransform(HumanBodyBones.UpperChest));
 
-        /*
-        Item jetBeamerLeft = o.JET_BEAMER_STANDARD_LEFT.Clone();
-        Item jetBeamerRight = o.JET_BEAMER_STANDARD_RIGHT.Clone();
-        itemEquiper.EquipItem(jetBeamerLeft);
-        itemEquiper.EquipItem(jetBeamerRight);
-        jetBeamerLeft.Show(anim.GetBoneTransform(HumanBodyBones.UpperChest));
-        jetBeamerRight.Show(anim.GetBoneTransform(HumanBodyBones.UpperChest));
-        */
+        currentMode = AIMode.Scouting;
+    }
+    protected GameUnit LookForEnemy(Faction lookForCharacterOfThisFaction)
+    {
+        ArrayList possibleTargets = GameUnit.unitsByFaction[lookForCharacterOfThisFaction];
+        foreach(GameUnit possibleTarget in possibleTargets)
+        {
+            if(possibleTarget.body != null && self.body != null)
+            {
+                if (self.senses.CanSee(possibleTarget))
+                {
+                    Debug.Log("I saw: " + possibleTarget.body);
+                    return possibleTarget;
+                }
+                else if (self.senses.CanHear(possibleTarget))
+                {
+                    Debug.Log("I heard: " + possibleTarget.body);
+                    return possibleTarget;
+                }
+            }
+        }
+        return null;
 
-        /*Visor vis = o.STANDARD_SOLDIER_VISOR.Clone();
-        itemEquiper.EquipItem(vis);
-        vis.Show(anim.GetBoneTransform(HumanBodyBones.Head));
-        */
-
-        //player = GameObject.Find("Player").transform;
-        //character.LookAt(player);
-
+    }
+    public void Hunt(GameUnit target)
+    {
+        Debug.Log("Hunting:" + target.uniqueName);
+        huntingTarget = target;
+        character.LookAt(target.body);
+        character.rifling = true;
+        currentMode = AIMode.Hunting;
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        if (Input.GetButton("AIRifleUp"))
+        reactionCycle += Time.deltaTime;
+
+        if (currentMode == AIMode.Scouting)
         {
-            if (!rifling)
+            if(reactionCycle > self.senses.reactionTime)
             {
-                rifling = true;
-                character.rifling = rifling;
-                Debug.Log("rifling: " + rifling);
-                //character.Equip();
+                GameUnit target = LookForEnemy(Organizer.FACTION_PLAYER);
+                if (target != null)
+                {
+                    Hunt(target);
+                }
+                else
+                {
+                    reactionCycle = 0;
+                }
+            }    
+        }else if(currentMode == AIMode.Hunting)
+        {
+            if(reactionCycle > self.senses.reactionTime/2)
+            {
+                reactionCycle = 0;
+                if (self.senses.CanSee(huntingTarget))
+                {
+                    character.shooting = true;
+                }
+                else
+                {
+                    character.shooting = false;
+                }
+
             }
         }
-        if (Input.GetButton("AIRifleDown"))
-        {
-            if (rifling)
-            {
-                rifling = false;
-                shooting = false;
-                character.shooting = shooting;
-                character.rifling = rifling;
-                //Debug.Log("rifling: " + rifling);
-            }
-        }
-        if (Input.GetButton("AIRifleShoot"))
-        {
-            if (!shooting)
-            {
-                shooting = true;
-                character.shooting = shooting;
-                //Debug.Log("Shooting: " + shooting);
-            }
-        }
-        if (Input.GetButton("AIRifleStopShoot"))
-        {
-            if (shooting)
-            {
-                shooting = false;
-                character.shooting = shooting;
-                //Debug.Log("Shooting: " + shooting);
-            }
-        }
+
+
         if (meshAgent != null)
         {
             if (Input.GetMouseButtonDown(0))
@@ -143,4 +165,46 @@ public class AIController : MonoBehaviour {
         }
 
 	}
+
+
+
+    /*if (Input.GetButton("AIRifleUp"))
+    {
+        if (!rifling)
+        {
+            rifling = true;
+            character.rifling = rifling;
+            Debug.Log("rifling: " + rifling);
+            //character.Equip();
+        }
+    }
+    if (Input.GetButton("AIRifleDown"))
+    {
+        if (rifling)
+        {
+            rifling = false;
+            shooting = false;
+            character.shooting = shooting;
+            character.rifling = rifling;
+            //Debug.Log("rifling: " + rifling);
+        }
+    }
+    if (Input.GetButton("AIRifleShoot"))
+    {
+        if (!shooting)
+        {
+            shooting = true;
+            character.shooting = shooting;
+            //Debug.Log("Shooting: " + shooting);
+        }
+    }
+    if (Input.GetButton("AIRifleStopShoot"))
+    {
+        if (shooting)
+        {
+            shooting = false;
+            character.shooting = shooting;
+            //Debug.Log("Shooting: " + shooting);
+        }
+    }*/
 }
