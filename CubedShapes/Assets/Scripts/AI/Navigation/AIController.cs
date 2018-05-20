@@ -10,11 +10,11 @@ public enum AIMode
 }
 public class AIController : MonoBehaviour {
 
-    public static System.Collections.Generic.Dictionary<AIController, Vector3> orders = new System.Collections.Generic.Dictionary<AIController, Vector3>();
+    public static System.Collections.Generic.Dictionary<AIController, Vector3> moveOrders = new System.Collections.Generic.Dictionary<AIController, Vector3>();
 
 
 
-    private NavMeshAgent meshAgent;
+    private NavMeshAgent navAgent;
     private Camera mainCam;
     private Character character;
     private Animator anim;
@@ -32,7 +32,7 @@ public class AIController : MonoBehaviour {
     private void Awake()
     {
         character = GetComponent<Character>();
-        meshAgent = GetComponent<NavMeshAgent>();
+        navAgent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         itemEquiper = GetComponent<ItemEquiper>();
 
@@ -44,7 +44,7 @@ public class AIController : MonoBehaviour {
         self = GetComponent<ColliderOwner>().owner;
 
         mainCam = GameObject.Find("MainCamera").GetComponent<Camera>();
-        meshAgent.updateRotation = false;
+        navAgent.updateRotation = false;
 
         Gun rifle = o.GUN_STANDARD_RIFLE.Clone();
         itemEquiper.EquipItem(rifle);
@@ -109,7 +109,7 @@ public class AIController : MonoBehaviour {
             }    
         }else if(currentMode == AIMode.Hunting)
         {
-            if(reactionCycle > self.senses.reactionTime/2)
+            if(reactionCycle > self.senses.reactionTime/4)
             {
                 reactionCycle = 0;
                 if (self.senses.CanSee(huntingTarget))
@@ -124,8 +124,8 @@ public class AIController : MonoBehaviour {
             }
         }
 
-
-        if (meshAgent != null)
+        // Manual orders
+        if (navAgent != null)
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -137,34 +137,36 @@ public class AIController : MonoBehaviour {
                     float y = hit.point.y;
                     float z = hit.point.z;
 
-                    orders.Remove(this);
+                    moveOrders.Remove(this);
 
-                    foreach (Vector3 order in orders.Values)
+                    foreach (Vector3 order in moveOrders.Values)
                     {
                         if(y == order.y && z == order.z && order.x-0.8 < x && order.x+0.8 > x){
                             x += 0.8f;
                         }
                     }
                     Vector3 destination = new Vector3(x, y, z);
-                    meshAgent.SetDestination(destination);
-                    orders.Add(this, destination);
+                    navAgent.SetDestination(destination);
+                    moveOrders.Add(this, destination);
 
-                }
-            }
-            if (character != null)
-            {
-                if (meshAgent.remainingDistance > meshAgent.stoppingDistance)
-                {
-                    character.Move(meshAgent.desiredVelocity,false,false);
-                }
-                else
-                {
-                    character.Move(Vector3.zero, false, false);
                 }
             }
         }
 
-	}
+        if (character != null)
+        {
+            if (navAgent.remainingDistance > navAgent.stoppingDistance)
+            {
+                character.Move(navAgent.desiredVelocity, false, false);
+            }
+            else
+            {
+                moveOrders.Remove(this);
+                character.Move(Vector3.zero, false, false);
+            }
+        }
+
+    }
 
 
 

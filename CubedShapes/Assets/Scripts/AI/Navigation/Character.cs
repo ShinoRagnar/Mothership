@@ -69,19 +69,6 @@ public class Character: MonoBehaviour
         // Used for jumping
         linkMover = this.gameObject.AddComponent<CharacterLinkMover>();
     }
-    public void UpdateWithEquippedItems()
-    {
-        foreach (Item j in itemEquiper.equipped.Values)
-        {
-            if(j is JetPack)
-            {
-                linkMover.characterJetpack = (JetPack)j;
-                break;
-            }
-
-            
-        }
-    }
 
     void Start()
     {
@@ -100,9 +87,18 @@ public class Character: MonoBehaviour
         rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
         //  rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
 
+    }
 
-
-
+    public void UpdateWithEquippedItems()
+    {
+        foreach (Item j in itemEquiper.equipped.Values)
+        {
+            if (j is JetPack)
+            {
+                linkMover.characterJetpack = (JetPack)j;
+                break;
+            }
+        }
     }
 
     public void LookAt(Transform lookTarget)
@@ -114,6 +110,7 @@ public class Character: MonoBehaviour
         eyesWeight = 0;
         clampWeight = 1;
     }
+
     public void Move(Vector3 move, bool crouch, bool jump)
     {
         if (move.magnitude > 1f) move.Normalize();
@@ -141,6 +138,7 @@ public class Character: MonoBehaviour
         // send input and other state parameters to the animator
         UpdateAnimator(move);
     }
+
     public void Bullet()
     {
         foreach (Item g in itemEquiper.equipped.Values)
@@ -154,7 +152,6 @@ public class Character: MonoBehaviour
             }
         }
     }
-
 
     void ScaleCapsuleForCrouching(bool crouch)
     {
@@ -193,6 +190,7 @@ public class Character: MonoBehaviour
             }
         }
     }
+
     private void OnAnimatorIK(int layerIndex)
     {
         if (lookingAt != null)
@@ -227,7 +225,6 @@ public class Character: MonoBehaviour
             m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
         }*/
     }
-
 
     void UpdateAnimator(Vector3 move)
     {
@@ -269,7 +266,6 @@ public class Character: MonoBehaviour
         }
     }
 
-
     void HandleAirborneMovement()
     {
         // apply extra gravity from multiplier:
@@ -279,7 +275,6 @@ public class Character: MonoBehaviour
 
         m_GroundCheckDistance = rigid.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
     }
-
 
     void HandleGroundedMovement(bool crouch, bool jump)
     {
@@ -301,7 +296,6 @@ public class Character: MonoBehaviour
         transform.Rotate(0, m_TurnAmount * turnSpeed * Time.deltaTime, 0);
     }
 
-
     public void OnAnimatorMove()
     {
         // we implement this function to override the default root motion.
@@ -315,7 +309,6 @@ public class Character: MonoBehaviour
             rigid.velocity = v;
         }
     }
-
 
     void CheckGroundStatus()
     {
