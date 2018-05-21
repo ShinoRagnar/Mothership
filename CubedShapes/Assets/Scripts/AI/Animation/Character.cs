@@ -16,19 +16,19 @@ public class Character: MonoBehaviour
     [SerializeField] float m_AnimSpeedMultiplier = 1f;
     [SerializeField] float m_GroundCheckDistance = 0.2f;
 
+
+    private float origGroundCheckDistance;
+    private const float k_Half = 0.5f;
+    private float turnAmount;
+    private float forwardAmount;
+    private Vector3 groundNormal;
+    private float capsuleHeight;
+    private Vector3 capsuleCenter;
+
+    //Public
     public float stationaryTurnMultiplier = 3;
-
-
-    bool m_IsGrounded;
-    float m_OrigGroundCheckDistance;
-    const float k_Half = 0.5f;
-    float m_TurnAmount;
-    float m_ForwardAmount;
-    Vector3 m_GroundNormal;
-    float m_CapsuleHeight;
-    Vector3 m_CapsuleCenter;
-
-    
+    public bool isGrounded;
+    public Transform lastWalkedOn;
 
     // Animation states
     public bool rifling;
@@ -79,11 +79,11 @@ public class Character: MonoBehaviour
         rifling = false;
         shooting = false;
 
-        m_CapsuleHeight = capsule.height;
-        m_CapsuleCenter = capsule.center;
+        capsuleHeight = capsule.height;
+        capsuleCenter = capsule.center;
 
         rigid.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-        m_OrigGroundCheckDistance = m_GroundCheckDistance;
+        origGroundCheckDistance = m_GroundCheckDistance;
 
         leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
         rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
@@ -118,14 +118,14 @@ public class Character: MonoBehaviour
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
         CheckGroundStatus();
-        move = Vector3.ProjectOnPlane(move, m_GroundNormal);
-        m_TurnAmount = Mathf.Atan2(move.x, move.z);
-        m_ForwardAmount = move.z;
+        move = Vector3.ProjectOnPlane(move, groundNormal);
+        turnAmount = Mathf.Atan2(move.x, move.z);
+        forwardAmount = move.z;
 
         ApplyExtraTurnRotation();
 
         // control and velocity handling is different when grounded and airborne:
-        if (m_IsGrounded)
+        if (isGrounded)
         {
             HandleGroundedMovement(crouch, jump);
         }
@@ -157,7 +157,7 @@ public class Character: MonoBehaviour
 
     void ScaleCapsuleForCrouching(bool crouch)
     {
-        if (m_IsGrounded && crouch)
+        if (isGrounded && crouch)
         {
             if (crouching) return;
             capsule.height = capsule.height / 2f;
@@ -167,14 +167,14 @@ public class Character: MonoBehaviour
         else
         {
             Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
-            float crouchRayLength = m_CapsuleHeight - capsule.radius * k_Half;
+            float crouchRayLength = capsuleHeight - capsule.radius * k_Half;
             if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
                 crouching = true;
                 return;
             }
-            capsule.height = m_CapsuleHeight;
-            capsule.center = m_CapsuleCenter;
+            capsule.height = capsuleHeight;
+            capsule.center = capsuleCenter;
             crouching = false;
         }
     }
@@ -185,7 +185,7 @@ public class Character: MonoBehaviour
         if (!crouching)
         {
             Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
-            float crouchRayLength = m_CapsuleHeight - capsule.radius * k_Half;
+            float crouchRayLength = capsuleHeight - capsule.radius * k_Half;
             if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
                 crouching = true;
@@ -201,7 +201,7 @@ public class Character: MonoBehaviour
             anim.SetLookAtPosition(lookingAt.position);
             // Debug.Log(lookingAt.position);
         }
-        if (m_ForwardAmount == 0 && m_TurnAmount == 0)
+        if (forwardAmount == 0 && turnAmount == 0)
         {
             anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
             anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
@@ -231,13 +231,13 @@ public class Character: MonoBehaviour
     void UpdateAnimator(Vector3 move)
     {
         // update the animator parameters
-        anim.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
-        anim.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
+        anim.SetFloat("Forward", forwardAmount, 0.1f, Time.deltaTime);
+        anim.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
         anim.SetBool("Crouch", crouching);
-        anim.SetBool("OnGround", m_IsGrounded);
+        anim.SetBool("OnGround", isGrounded);
         anim.SetBool("Rifling", rifling);
         anim.SetBool("Shooting", shooting);
-        if (!m_IsGrounded)
+        if (!isGrounded)
         {
 
             anim.SetFloat("Jump", rigid.velocity.y);
@@ -249,15 +249,15 @@ public class Character: MonoBehaviour
         float runCycle =
             Mathf.Repeat(
                 anim.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
-        float jumpLeg = (runCycle < k_Half ? 1 : -1) * m_ForwardAmount;
-        if (m_IsGrounded)
+        float jumpLeg = (runCycle < k_Half ? 1 : -1) * forwardAmount;
+        if (isGrounded)
         {
             anim.SetFloat("JumpLeg", jumpLeg);
         }
 
         // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
         // which affects the movement speed because of the root motion.
-        if (m_IsGrounded && move.magnitude > 0)
+        if (isGrounded && move.magnitude > 0)
         {
             anim.speed = m_AnimSpeedMultiplier;
         }
@@ -275,7 +275,7 @@ public class Character: MonoBehaviour
         Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
         rigid.AddForce(extraGravityForce);
 
-        m_GroundCheckDistance = rigid.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
+        m_GroundCheckDistance = rigid.velocity.y < 0 ? origGroundCheckDistance : 0.01f;
     }
 
     void HandleGroundedMovement(bool crouch, bool jump)
@@ -285,7 +285,7 @@ public class Character: MonoBehaviour
         {
             // jump!
             rigid.velocity = new Vector3(rigid.velocity.x, m_JumpPower, rigid.velocity.z);
-            m_IsGrounded = false;
+            isGrounded = false;
             anim.applyRootMotion = false;
             m_GroundCheckDistance = 0.1f;
         }
@@ -294,8 +294,8 @@ public class Character: MonoBehaviour
     void ApplyExtraTurnRotation()
     {
         // help the character turn faster (this is in addition to root rotation in the animation)
-        float turnSpeed = Mathf.Lerp(m_StationaryTurnSpeed, m_MovingTurnSpeed, m_ForwardAmount);
-        transform.Rotate(0, m_TurnAmount * turnSpeed * Time.deltaTime, 0);
+        float turnSpeed = Mathf.Lerp(m_StationaryTurnSpeed, m_MovingTurnSpeed, forwardAmount);
+        transform.Rotate(0, turnAmount * turnSpeed * Time.deltaTime, 0);
     }
     public void FaceTarget(Vector3 destination)
     {
@@ -308,7 +308,7 @@ public class Character: MonoBehaviour
     {
         // we implement this function to override the default root motion.
         // this allows us to modify the positional speed before it's applied.
-        if (m_IsGrounded && Time.deltaTime > 0)
+        if (isGrounded && Time.deltaTime > 0)
         {
             Vector3 v = (anim.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
 
@@ -317,27 +317,29 @@ public class Character: MonoBehaviour
             rigid.velocity = v;
         }
     }
-
-    void CheckGroundStatus()
+    public bool IsGrounded()
     {
-        if (!navAgent.isOnOffMeshLink)
+        return !navAgent.isOnOffMeshLink;
+    }
+    private void CheckGroundStatus()
+    {
+        if (IsGrounded())
         {
-            
-
-            m_IsGrounded = true;
+            isGrounded = true;
             anim.applyRootMotion = true;
             RaycastHit hitInfo;
             int layer_mask = LayerMask.GetMask(Organizer.LAYER_GROUND);
 
             if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, Mathf.Infinity, layer_mask))
             {
-                m_GroundNormal = hitInfo.normal;
+                groundNormal = hitInfo.normal;
+                lastWalkedOn = hitInfo.collider.transform;
             }
 
         }else{
             
-            m_IsGrounded = false;
-            m_GroundNormal = Vector3.up;
+            isGrounded = false;
+            groundNormal = Vector3.up;
             anim.applyRootMotion = false;
         }
     }

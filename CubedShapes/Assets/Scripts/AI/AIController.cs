@@ -6,7 +6,8 @@ using UnityEngine.AI;
 public enum AIMode
 {
     Scouting,
-    Hunting
+    Hunting,
+    Relocating
 }
 public class AIController : MonoBehaviour {
 
@@ -90,39 +91,115 @@ public class AIController : MonoBehaviour {
         
     }
 	
-	// Update is called once per frame
-	void Update () {
+    protected bool IsTargetTooClose()
+    {
+        return Mathf.Abs(self.body.position.x - huntingTarget.body.position.x) < tooCloseForComfortDistance
+               &&
+               Mathf.Abs(self.body.position.y - huntingTarget.body.position.y) < tooCloseForComfortDistance
+               ;
+    }
+    protected Dictionary<Ground, float> GetPossibleMovesAtDistanceFromTarget(float distance)
+    {
+        Dictionary<Ground, float> possibleMoves = new Dictionary<Ground, float>();
+        if (NavMeshAttachor.generated.ContainsKey(character.lastWalkedOn))
+        {
+            Ground currentGround = NavMeshAttachor.generated[character.lastWalkedOn];
+            if (CanMoveRightToPreferredDistance(currentGround))
+            {
+                possibleMoves.Add(currentGround, huntingTarget.body.position.x + distance);
+            }
+            else if (CanMoveLeftToPreferredDistance(currentGround))
+            {
+                possibleMoves.Add(currentGround, huntingTarget.body.position.x - distance);
+            }
+
+            Collider[] considerations = Physics.OverlapSphere(huntingTarget.body.position, distance);
+
+            foreach (Collider c in considerations)
+            {
+                if (NavMeshAttachor.generated.ContainsKey(c.transform))
+                {
+                    Ground consideration = NavMeshAttachor.generated[c.transform];
+
+                    foreach (Vector3 link in currentGround.links.Keys)
+                    {
+                        if (
+                            //TODO: Should also take Y into consideration
+                            //Move Right
+                                (
+                                self.body.position.x > huntingTarget.body.position.x
+                                && link.x > huntingTarget.body.position.x
+                                && currentGround.startPointToEndPoint[link].x >= link.x
+                                && currentGround.distances[link].ContainsKey(consideration)
+                                )
+                                ||
+                            // Move left
+                                (
+                                self.body.position.x < huntingTarget.body.position.x
+                                && link.x < huntingTarget.body.position.x
+                                && currentGround.startPointToEndPoint[link].x <= link.x
+                                && currentGround.distances[link].ContainsKey(consideration)
+                                )
+                            )
+                        {
+                            possibleMoves.Add(consideration, consideration.GetMidPoint().x);
+                        }
+                    }
+                }
+            }
+        }
+        return possibleMoves;
+    }
+    private bool CanMoveRightToPreferredDistance(Ground on)
+    {
+        return self.body.position.x > huntingTarget.body.position.x && huntingTarget.body.position.x + preferredDistance < on.obj.position.x + on.obj.localScale.x / 2;
+    }
+    private bool CanMoveLeftToPreferredDistance(Ground on)
+    {
+        return self.body.position.x < huntingTarget.body.position.x && huntingTarget.body.position.x - preferredDistance > on.obj.position.x - on.obj.localScale.x / 2;
+    }
+
+    // Update is called once per frame
+    void Update () {
 
         reactionCycle += Time.deltaTime;
 
-        if (currentMode == AIMode.Scouting)
+        if (currentMode == AIMode.Scouting && reactionCycle > self.senses.reactionTime)
         {
-            if(reactionCycle > self.senses.reactionTime)
-            {
-                GameUnit target = LookForEnemy(Organizer.FACTION_PLAYER);
-                if (target != null)
-                {
-                    Hunt(target);
-                }
-                else
-                {
-                    reactionCycle = 0;
-                }
-            }    
-        }else if(currentMode == AIMode.Hunting)
-        {
-            if(reactionCycle > self.senses.reactionTime/4)
-            {
+            GameUnit target = LookForEnemy(Organizer.FACTION_PLAYER);
+            if (target != null){
+                Hunt(target);
+            }else{
                 reactionCycle = 0;
-                if (self.senses.CanSee(huntingTarget))
-                {
+            }
+        }else if (currentMode == AIMode.Hunting && reactionCycle > self.senses.reactionTime / 4){
+            if (IsTargetTooClose()){
+                Debug.Log("I need to fall back");
+                currentMode = AIMode.Relocating;
+                character.shooting = false;
+            }else{
+                if (self.senses.CanSee(huntingTarget)){
                     character.shooting = true;
-                }
-                else
-                {
+                }else{
                     character.shooting = false;
                 }
+                reactionCycle = 0;
+            }
+        }
+        else if (currentMode == AIMode.Relocating && reactionCycle > self.senses.reactionTime / 4 && character.IsGrounded() && character.lastWalkedOn != null)
+        {
+            reactionCycle = 0;
+            if (IsTargetTooClose()) {
+                Dictionary<Ground, float> possibleMoves = GetPossibleMovesAtDistanceFromTarget(preferredDistance);
 
+                foreach(Ground p in possibleMoves.Keys){
+                    navAgent.SetDestination(new Vector3(possibleMoves[p], p.GetMidPoint().y));
+                    Debug.Log("Relocating to: " + p.obj.transform.gameObject.name);
+                    break;
+                }
+                    
+            }else{
+                currentMode = AIMode.Hunting;
             }
         }
 

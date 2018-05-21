@@ -27,7 +27,7 @@ public class Faction{
     }
     public void SetHostileTo(Faction f)
     {
-        Debug.Log("These factions are now hostile: "+this.factionName + " " + f.factionName);
+        //Debug.Log("These factions are now hostile: "+this.factionName + " " + f.factionName);
         SetHostile(f);
         f.SetHostile(this);
     }

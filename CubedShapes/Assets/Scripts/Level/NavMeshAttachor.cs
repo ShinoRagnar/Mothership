@@ -13,6 +13,7 @@ public class NavMeshAttachor : MonoBehaviour {
     //private System.Collections.ArrayList children;
     private System.Collections.Generic.SortedDictionary<float, System.Collections.Generic.Dictionary<Transform, System.Collections.Generic.Dictionary<string, GameObject>>> heightSortedLinks;
     private System.Collections.Generic.Dictionary<Transform,Transform> linkToGround;
+    private System.Collections.Generic.Dictionary<Transform, Transform> alreadyLinked;
 
 
     private NavMeshSurface nav;
@@ -34,11 +35,13 @@ public class NavMeshAttachor : MonoBehaviour {
             //children = new System.Collections.ArrayList();
             heightSortedLinks = new System.Collections.Generic.SortedDictionary<float, System.Collections.Generic.Dictionary<Transform, System.Collections.Generic.Dictionary<string,GameObject>>>();
             linkToGround = new System.Collections.Generic.Dictionary<Transform, Transform>();
-
+            alreadyLinked = new System.Collections.Generic.Dictionary<Transform, Transform>();
 
             ListChildren(transform);
-            CreateLeftRightLinks();
-            CreateTopDownLinks();
+           
+            CreateLinkGameObjects();
+            CreateNavMeshLinksAndGrounds();
+            GenerateDistancesBetweenGrounds();
 
             if (nav != null)
             {
@@ -46,15 +49,23 @@ public class NavMeshAttachor : MonoBehaviour {
             }
         }
 	}
-    private void CreateTopDownLinks()
+    private void GenerateDistancesBetweenGrounds()
+    {
+        foreach(Ground g in generated.Values)
+        {
+            g.GenerateDistanceLists();
+        }
+    }
+
+    private void CreateNavMeshLinksAndGrounds()
     {
         System.Collections.Generic.SortedDictionary<string, GameObject> added = new System.Collections.Generic.SortedDictionary<string, GameObject>();
         foreach (float f in heightSortedLinks.Keys)
         {
             foreach (Transform t in heightSortedLinks[f].Keys)
             {
-                bool leftLinkFound = false;
-                bool rightLinkFound = false;
+                //bool leftLinkFound = false;
+                //bool rightLinkFound = false;
                 GameObject leftLink = heightSortedLinks[f][t][LINK_LEFT];
                 GameObject rightLink = heightSortedLinks[f][t][LINK_RIGHT];
                 float yPos = -f;
@@ -70,7 +81,8 @@ public class NavMeshAttachor : MonoBehaviour {
                             string leftLinkName = leftLink.name + " to " + compRightLink.name;
                             string rightLinkName = rightLink.name + " to " + compLeftLink.name;
 
-                            if (!leftLinkFound //!added.ContainsKey(leftLinkName)
+                            if (//!leftLinkFound //!added.ContainsKey(leftLinkName)
+                                    !(alreadyLinked.ContainsKey(leftLink.transform) || alreadyLinked.ContainsKey(compRightLink.transform))
                                     &&
                                     compLeftLink.transform.position.x < leftLink.transform.position.x
                                     &&
@@ -83,10 +95,14 @@ public class NavMeshAttachor : MonoBehaviour {
                                 {
                                     GameObject mid = Link(rightLinkName, leftLink.transform, compRightLink.transform);
                                     added.Add(leftLinkName, mid);
-                                    leftLinkFound = true;
+                                    alreadyLinked.Add(leftLink.transform, leftLink.transform);
+                                    alreadyLinked.Add(compRightLink.transform, compRightLink.transform);
+
+                                    //leftLinkFound = true;
                                 }
                             }
-                            if (!rightLinkFound //!added.ContainsKey(rightLinkName)
+                            if (//!rightLinkFound //!added.ContainsKey(rightLinkName)
+                                    !(alreadyLinked.ContainsKey(rightLink.transform) || alreadyLinked.ContainsKey(compLeftLink.transform))
                                     &&
                                     compLeftLink.transform.position.x - LINK_JUMP_DISTANCE_X < rightLink.transform.position.x
                                     &&
@@ -97,14 +113,16 @@ public class NavMeshAttachor : MonoBehaviour {
                             {
                                     GameObject mid = Link(rightLinkName, rightLink.transform, compLeftLink.transform);
                                     added.Add(rightLinkName, mid);
-                                    rightLinkFound = true;
+                                    alreadyLinked.Add(rightLink.transform, rightLink.transform);
+                                    alreadyLinked.Add(compLeftLink.transform, compLeftLink.transform);
+                                    //rightLinkFound = true;
                             }
                         }
 
                     }
                     //Debug.Log(yPos);
                 }
-                if (!leftLinkFound)
+                if (!alreadyLinked.ContainsKey(leftLink.transform))//!leftLinkFound)
                 {
                     GameObject go = RayHit(leftLink, -LINK_EDGE_DISTANCE * 2);
                     if(go != null)
@@ -113,7 +131,7 @@ public class NavMeshAttachor : MonoBehaviour {
                         Link(leftLink.name + DROP + LINK + LEFT + DROP, leftLink.transform, go.transform);
                     }
                 }
-                if (!rightLinkFound)
+                if (!alreadyLinked.ContainsKey(rightLink.transform))//!rightLinkFound)
                 {
                     GameObject go = RayHit(rightLink, LINK_EDGE_DISTANCE * 2);
                     if (go != null)
@@ -167,8 +185,15 @@ public class NavMeshAttachor : MonoBehaviour {
 
         // Add generated links to list
         if(generated.ContainsKey(linkToGround[from])  && generated.ContainsKey(linkToGround[to])) {
-            generated[linkToGround[from]].links.Add(navLink.startPoint, generated[linkToGround[to]]);
-            generated[linkToGround[to]].links.Add(navLink.endPoint, generated[linkToGround[from]]);
+            Vector3 fromPoint = new Vector3(from.position.x, from.position.y, 0);
+            Vector3 toPoint = new Vector3(to.position.x, to.position.y, 0);
+
+
+            generated[linkToGround[from]].links.Add(fromPoint, generated[linkToGround[to]]);
+            generated[linkToGround[to]].links.Add(toPoint, generated[linkToGround[from]]);
+            generated[linkToGround[from]].startPointToEndPoint.Add(fromPoint, toPoint);
+            generated[linkToGround[to]].startPointToEndPoint.Add(toPoint, fromPoint);
+
         }
         else
         {
@@ -179,7 +204,7 @@ public class NavMeshAttachor : MonoBehaviour {
     }
  
     
-    private void CreateLeftRightLinks()
+    private void CreateLinkGameObjects()
     {
         foreach (Transform child in generated.Keys)//children)
         {
