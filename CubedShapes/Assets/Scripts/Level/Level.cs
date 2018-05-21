@@ -11,6 +11,10 @@ public class Level : MonoBehaviour {
     public float height;
     public float xOffset;
 
+    
+
+  
+
     private void Awake()
     {
         rand = new System.Random();

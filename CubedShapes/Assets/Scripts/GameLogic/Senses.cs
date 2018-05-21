@@ -76,6 +76,7 @@ public class Senses {
                 if (sens == Sense.Seeing)
                 {
                     Vector3 fromPosition = selfBody.position;
+                    fromPosition.y += owner.headYOffset; 
                     Vector3 toPosition = targetBody.position;
                     Vector3 direction = toPosition - fromPosition;
                     RaycastHit hit;
@@ -87,6 +88,7 @@ public class Senses {
                         {
                             if(co.owner == target)
                             {
+                                //Debug.DrawRay(fromPosition, direction, Color.green);
                                 return true;
                             }
                         }

@@ -27,7 +27,7 @@ public class Gun : Item {
             if (Physics.Raycast(fromPosition, direction, out hit))
             {
                 Forge3D.Forcefield ffHit = hit.collider.transform.GetComponentInParent<Forge3D.Forcefield>();
-
+                //Debug.DrawRay(fromPosition, direction, Color.green);
                 // Generate random hit power value and call Force Field script if successful
                 if (ffHit != null)
                 {

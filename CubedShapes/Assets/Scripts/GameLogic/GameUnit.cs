@@ -10,6 +10,7 @@ public class GameUnit{
 
     public Faction belongsToFaction;
     public float weight;
+    public float headYOffset;
     public Health health;
     public Senses senses;
     public string unitName;
@@ -18,12 +19,13 @@ public class GameUnit{
     public Transform body;
 
 
-    public GameUnit(string unitNameVal, Faction f, Health h, Senses s, float weightVal)
+    public GameUnit(string unitNameVal, Faction f, Health h, Senses s, float weightVal, float headYOffsetVal)
     {
         this.belongsToFaction = f;
         this.health = h;
         this.senses = s;
         this.weight = weightVal;
+        this.headYOffset = headYOffsetVal;
         this.unitName = unitNameVal;
         if (activeUnits.ContainsKey(unitName))
         {
@@ -38,6 +40,6 @@ public class GameUnit{
     public GameUnit Clone()
     {
         
-        return new GameUnit(unitName, belongsToFaction, health.Clone(),senses.Clone(),  weight);
+        return new GameUnit(unitName, belongsToFaction, health.Clone(),senses.Clone(),  weight, headYOffset);
     }
 }

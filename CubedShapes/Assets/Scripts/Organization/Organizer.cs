@@ -101,8 +101,8 @@ public class Organizer : MonoBehaviour {
     //public Visor STANDARD_SOLDIER_VISOR;
 
     //Senses
-    public static Senses STANDARD_HUMANOID_SENSES = new Senses(100, 20, 15, 15, 1);
-    public static Senses STANDARD_ROBOT_SENSES = new Senses(100, 100, 100, 100, 1);
+    public static Senses STANDARD_HUMANOID_SENSES = new Senses(100, 20, 15, 15, 0.5f);
+    public static Senses STANDARD_ROBOT_SENSES = new Senses(100, 100, 100, 100, 0.25f);
 
     //Factions
     public static Faction FACTION_PLAYER = new Faction("Player Faction");
@@ -110,11 +110,11 @@ public class Organizer : MonoBehaviour {
 
     //Soldiers
     public static Health ENEMY_SOLDIER_STANDARD_HEALTH = new Health(100, 200, 0, 1);
-    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, STANDARD_HUMANOID_SENSES, 100);
+    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, STANDARD_HUMANOID_SENSES, 100,2);
 
     //Player
     public static Health PLAYER_STANDARD_HEALTH = new Health(1000, 2000, 1, 10);
-    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, STANDARD_ROBOT_SENSES, 1000);
+    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, STANDARD_ROBOT_SENSES, 1000, 1);
 
 
 
