@@ -15,11 +15,11 @@ public class AIController : MonoBehaviour {
 
 
 
-    private NavMeshAgent navAgent;
+    public NavMeshAgent navAgent;
     private Camera mainCam;
-    private Character character;
+    public Character character;
     private Animator anim;
-    private ItemEquiper itemEquiper;
+    public ItemEquiper itemEquiper;
     private GameUnit self;
     private Organizer o;
 
@@ -34,14 +34,11 @@ public class AIController : MonoBehaviour {
     // Use this for initialization
     private void Awake()
     {
-        character = GetComponent<Character>();
-        navAgent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
-        itemEquiper = GetComponent<ItemEquiper>();
-
     }
 
     void Start () {
+
         o = Organizer.instance;
 
         self = GetComponent<ColliderOwner>().owner;
@@ -85,7 +82,7 @@ public class AIController : MonoBehaviour {
     {
         Debug.Log("Hunting:" + target.uniqueName);
         huntingTarget = target;
-        character.LookAt(target.body);
+        character.LookAt(target);
         character.rifling = true;
         currentMode = AIMode.Hunting;
         
@@ -194,7 +191,7 @@ public class AIController : MonoBehaviour {
 
                 foreach(Ground p in possibleMoves.Keys){
                     navAgent.SetDestination(new Vector3(possibleMoves[p], p.GetMidPoint().y));
-                    Debug.Log("Relocating to: " + p.obj.transform.gameObject.name);
+                    //Debug.Log("Relocating to: " + p.obj.transform.gameObject.name);
                     break;
                 }
                     

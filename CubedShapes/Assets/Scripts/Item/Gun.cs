@@ -15,10 +15,21 @@ public class Gun : Item {
         this.gunpoint = gunp;
         this.muzzle = muzzl;
     }
-    public void ShootAt(Transform target)
+    public void ShootAt(GameUnit target)
     {
         if (showing) {
-            RaycastHit hit;
+
+            RaycastHit hit = ie.equippedUnit.senses.TryToHit(muzzle.visualItem.transform.position, target, Senses.MAX_RAY_CASTS_WHEN_TRY_TO_SEE);
+            if(hit.collider != null)
+            {
+                Forge3D.Forcefield ffHit = hit.collider.transform.GetComponentInParent<Forge3D.Forcefield>();
+                if (ffHit != null)
+                {
+                    float hitPower = Random.Range(-2f, 2f);
+                    ffHit.OnHit(hit.point, hitPower);
+                }
+            }
+            /*RaycastHit hit;
             Vector3 fromPosition = muzzle.visualItem.transform.position;
             Vector3 toPosition = target.transform.position;
             Vector3 direction = toPosition - fromPosition;
@@ -34,7 +45,7 @@ public class Gun : Item {
                     float hitPower = Random.Range(-2f, 2f);
                     ffHit.OnHit(hit.point, hitPower);
                 }
-            }
+            }*/
             muzzle.ReEnable();
         }
     }

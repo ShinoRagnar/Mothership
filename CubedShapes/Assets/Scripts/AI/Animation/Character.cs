@@ -12,8 +12,8 @@ public class Character: MonoBehaviour
     [SerializeField] float m_JumpPower = 6f;
     [Range(1f, 4f)] [SerializeField] float m_GravityMultiplier = 2f;
     [SerializeField] float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
-    [SerializeField] float m_MoveSpeedMultiplier = 1f;
-    [SerializeField] float m_AnimSpeedMultiplier = 1f;
+    [SerializeField] float m_MoveSpeedMultiplier = 1; //1f;
+    [SerializeField] float m_AnimSpeedMultiplier = 1; //1f;
     [SerializeField] float m_GroundCheckDistance = 0.2f;
 
 
@@ -49,33 +49,28 @@ public class Character: MonoBehaviour
     //Hand IK
     //private Transform rightHand;
     //Head IK
-    private Transform lookingAt;
+    private GameUnit lookingAt;
 
     // Components
-    private ItemEquiper itemEquiper;
+    public ItemEquiper itemEquiper;
     private Rigidbody rigid;
     private Animator anim;
     private CapsuleCollider capsule;
-    private NavMeshAgent navAgent;
+    public NavMeshAgent navAgent;
     private CharacterLinkMover linkMover;
 
 
     public void Awake()
     {
-        itemEquiper = GetComponent<ItemEquiper>();
-        itemEquiper.equippedCharacter = this;
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
-        navAgent = GetComponent<NavMeshAgent>();
-        // Used for jumping
         linkMover = this.gameObject.AddComponent<CharacterLinkMover>();
     }
 
     void Start()
     {
-       // o = Organizer.instance;
-
+        
         rifling = false;
         shooting = false;
 
@@ -87,7 +82,6 @@ public class Character: MonoBehaviour
 
         leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
         rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
-        //  rightHand = anim.GetBoneTransform(HumanBodyBones.RightHand);
 
     }
 
@@ -103,7 +97,7 @@ public class Character: MonoBehaviour
         }
     }
 
-    public void LookAt(Transform lookTarget)
+    public void LookAt(GameUnit lookTarget)
     {
         lookingAt = lookTarget;
         lookIKWeight = 1;
@@ -198,7 +192,7 @@ public class Character: MonoBehaviour
         if (lookingAt != null)
         {
             anim.SetLookAtWeight(lookIKWeight, bodyWeight, headWeight, eyesWeight, clampWeight);
-            anim.SetLookAtPosition(lookingAt.position);
+            anim.SetLookAtPosition(lookingAt.body.position);
             // Debug.Log(lookingAt.position);
         }
         if (forwardAmount == 0 && turnAmount == 0)

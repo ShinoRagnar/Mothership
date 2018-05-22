@@ -24,9 +24,12 @@ public class Organizer : MonoBehaviour {
     public static string LAYER_ENEMY = "Enemy";
     public static string LAYER_NO_INTERACTION = "No Interaction";
 
-    // ---------------------- PREFAB
-    //Enemy
-    public Transform UNIT_ENEMY_SOLDIER;
+    public static string[] LAYERS_GAME_OBJECTS = new string[] { LAYER_GROUND, LAYER_ENEMY, LAYER_SHIELDS, LAYER_PLAYER };
+
+
+// ---------------------- PREFAB
+//Enemy
+public Transform UNIT_ENEMY_SOLDIER;
 
     // Air Vents
     public Transform P_AIR_BLOCK;

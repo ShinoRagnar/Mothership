@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemySpawner : MonoBehaviour {
 
@@ -32,6 +33,22 @@ public class EnemySpawner : MonoBehaviour {
         ColliderOwner co = enemyBody.gameObject.AddComponent<ColliderOwner>();
         co.owner = enemy;
         enemy.body = enemyBody;
+
+        //Body components
+        ItemEquiper ie = enemyBody.gameObject.AddComponent<ItemEquiper>();
+        NavMeshAgent nma = enemyBody.gameObject.AddComponent<NavMeshAgent>();
+        AIController aic = enemyBody.gameObject.AddComponent<AIController>();
+        Character c = enemyBody.gameObject.AddComponent<Character>();
+
+        //Inner variables
+        c.navAgent = nma;
+        c.itemEquiper = ie;
+        ie.equippedCharacter = c;
+        ie.equippedUnit = enemy;
+        aic.character = c;
+        aic.navAgent = nma;
+        aic.itemEquiper = ie;
+
 
         //Shield
         Transform enemyShield = Instantiate(o.P_FORCE_SHIELD, enemyBody);

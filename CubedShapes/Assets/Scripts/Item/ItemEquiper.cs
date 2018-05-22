@@ -6,6 +6,7 @@ public class ItemEquiper : MonoBehaviour {
 
     public System.Collections.Generic.Dictionary<string, Item> equipped;
     public Character equippedCharacter;
+    public GameUnit equippedUnit;
 
     public void Awake()
     {
