@@ -68,6 +68,29 @@ public class PlayerSpawner : MonoBehaviour {
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_PLAYER, playerNode.gameObject);
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_SHIELDS, playerShield.gameObject);
 
-        
+        //Shows threat levels (For debug purposes)
+        if (DevelopmentSettings.SHOW_THREAT_LEVELS) { 
+            GameObject threatPreferred = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            threatPreferred.GetComponent<BoxCollider>().enabled = false;
+            threatPreferred.transform.localScale = new Vector3(AIController.DISTANCE_PREFERRED * 2, 0.5f, 0.5f);
+            threatPreferred.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 3);
+            threatPreferred.transform.parent = body.transform;
+            Renderer rend = threatPreferred.GetComponent<Renderer>();
+            rend.material.shader = Shader.Find("_Color");
+            rend.material.SetColor("_Color", Color.green);
+            rend.material.shader = Shader.Find("Specular");
+            rend.material.SetColor("_SpecColor", Color.green);
+
+            GameObject threatTooClose = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            threatTooClose.GetComponent<BoxCollider>().enabled = false;
+            threatTooClose.transform.localScale = new Vector3(AIController.DISTANCE_TOO_CLOSE * 2, 0.5f, 0.5f);
+            threatTooClose.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 2.9f);
+            threatTooClose.transform.parent = body.transform;
+            Renderer rendToo = threatTooClose.GetComponent<Renderer>();
+            rendToo.material.shader = Shader.Find("_Color");
+            rendToo.material.SetColor("_Color", Color.red);
+            rendToo.material.shader = Shader.Find("Specular");
+            rendToo.material.SetColor("_SpecColor", Color.red);
+        }
     }
 }

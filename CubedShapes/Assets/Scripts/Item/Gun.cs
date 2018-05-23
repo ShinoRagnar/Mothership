@@ -27,6 +27,7 @@ public class Gun : Item {
                 {
                     float hitPower = Random.Range(-2f, 2f);
                     ffHit.OnHit(hit.point, hitPower);
+                    //Debug.Log("Shooting at: " + Time.time);
                 }
             }
             /*RaycastHit hit;

@@ -6,7 +6,8 @@ public class Level : MonoBehaviour {
 
     public static Level instance;
 
-    public System.Random rand;
+    public System.Random rand = new System.Random();
+
     public float width;
     public float height;
     public float xOffset;
@@ -17,7 +18,6 @@ public class Level : MonoBehaviour {
 
     private void Awake()
     {
-        rand = new System.Random();
         instance = this;
     }
 

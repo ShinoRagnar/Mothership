@@ -27,10 +27,11 @@ public class AIController : MonoBehaviour {
     AIMode currentMode;
     public GameUnit huntingTarget;
     private float reactionCycle = 0;
-    //Behaviour
-    public float preferredDistance = 20;
-    public float tooCloseForComfortDistance = 10;
 
+    //Behaviour
+    public static float DISTANCE_PREFERRED = 20;
+    public static float DISTANCE_TOO_CLOSE = 10;
+    
     // Use this for initialization
     private void Awake()
     {
@@ -65,12 +66,12 @@ public class AIController : MonoBehaviour {
             {
                 if (self.senses.CanSee(possibleTarget))
                 {
-                    Debug.Log("I saw: " + possibleTarget.body);
+                    //Debug.Log("I saw: " + possibleTarget.body);
                     return possibleTarget;
                 }
                 else if (self.senses.CanHear(possibleTarget))
                 {
-                    Debug.Log("I heard: " + possibleTarget.body);
+                    //Debug.Log("I heard: " + possibleTarget.body);
                     return possibleTarget;
                 }
             }
@@ -80,7 +81,7 @@ public class AIController : MonoBehaviour {
     }
     public void Hunt(GameUnit target)
     {
-        Debug.Log("Hunting:" + target.uniqueName);
+        //Debug.Log("Hunting:" + target.uniqueName+" at:"+Time.time);
         huntingTarget = target;
         character.LookAt(target);
         character.rifling = true;
@@ -90,9 +91,9 @@ public class AIController : MonoBehaviour {
 	
     protected bool IsTargetTooClose()
     {
-        return Mathf.Abs(self.body.position.x - huntingTarget.body.position.x) < tooCloseForComfortDistance
+        return Mathf.Abs(self.body.position.x - huntingTarget.body.position.x) < DISTANCE_TOO_CLOSE
                &&
-               Mathf.Abs(self.body.position.y - huntingTarget.body.position.y) < tooCloseForComfortDistance
+               Mathf.Abs(self.body.position.y - huntingTarget.body.position.y) < DISTANCE_TOO_CLOSE
                ;
     }
     protected Dictionary<Ground, float> GetPossibleMovesAtDistanceFromTarget(float distance)
@@ -149,11 +150,11 @@ public class AIController : MonoBehaviour {
     }
     private bool CanMoveRightToPreferredDistance(Ground on)
     {
-        return self.body.position.x > huntingTarget.body.position.x && huntingTarget.body.position.x + preferredDistance < on.obj.position.x + on.obj.localScale.x / 2;
+        return self.body.position.x > huntingTarget.body.position.x && huntingTarget.body.position.x + DISTANCE_PREFERRED < on.obj.position.x + on.obj.localScale.x / 2;
     }
     private bool CanMoveLeftToPreferredDistance(Ground on)
     {
-        return self.body.position.x < huntingTarget.body.position.x && huntingTarget.body.position.x - preferredDistance > on.obj.position.x - on.obj.localScale.x / 2;
+        return self.body.position.x < huntingTarget.body.position.x && huntingTarget.body.position.x - DISTANCE_PREFERRED > on.obj.position.x - on.obj.localScale.x / 2;
     }
 
     // Update is called once per frame
@@ -161,7 +162,7 @@ public class AIController : MonoBehaviour {
 
         reactionCycle += Time.deltaTime;
 
-        if (currentMode == AIMode.Scouting && reactionCycle > self.senses.reactionTime)
+        if (currentMode == AIMode.Scouting && reactionCycle > self.senses.GetReactionTime())
         {
             GameUnit target = LookForEnemy(Organizer.FACTION_PLAYER);
             if (target != null){
@@ -169,9 +170,9 @@ public class AIController : MonoBehaviour {
             }else{
                 reactionCycle = 0;
             }
-        }else if (currentMode == AIMode.Hunting && reactionCycle > self.senses.reactionTime / 4){
+        }else if (currentMode == AIMode.Hunting && reactionCycle > self.senses.GetReactionTime() / 4){
             if (IsTargetTooClose()){
-                Debug.Log("I need to fall back");
+                Debug.Log("I need to fall back: "+Time.time);
                 currentMode = AIMode.Relocating;
                 character.shooting = false;
             }else{
@@ -183,11 +184,11 @@ public class AIController : MonoBehaviour {
                 reactionCycle = 0;
             }
         }
-        else if (currentMode == AIMode.Relocating && reactionCycle > self.senses.reactionTime / 4 && character.IsGrounded() && character.lastWalkedOn != null)
+        else if (currentMode == AIMode.Relocating && reactionCycle > self.senses.GetReactionTime() / 4 && character.IsGrounded() && character.lastWalkedOn != null)
         {
             reactionCycle = 0;
             if (IsTargetTooClose()) {
-                Dictionary<Ground, float> possibleMoves = GetPossibleMovesAtDistanceFromTarget(preferredDistance);
+                Dictionary<Ground, float> possibleMoves = GetPossibleMovesAtDistanceFromTarget(DISTANCE_PREFERRED);
 
                 foreach(Ground p in possibleMoves.Keys){
                     navAgent.SetDestination(new Vector3(possibleMoves[p], p.GetMidPoint().y));

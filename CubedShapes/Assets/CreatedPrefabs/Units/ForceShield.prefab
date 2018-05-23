@@ -176,7 +176,7 @@ MonoBehaviour:
   CollisionStay: 0
   CollisionExit: 0
   DecaySpeed: 2
-  ReactSpeed: 0.1
+  ReactSpeed: 0
   FixNonUniformScale: 0
 --- !u!135 &135603135537442488
 SphereCollider:

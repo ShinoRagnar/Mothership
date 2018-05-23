@@ -366,13 +366,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4318408460668504}
-  - component: {fileID: 195383024450502026}
-  - component: {fileID: 114887323957193398}
-  - component: {fileID: 114112470375425680}
   - component: {fileID: 95257463991390152}
   - component: {fileID: 136019385315401430}
   - component: {fileID: 54518264319743762}
-  - component: {fileID: 114150858934624966}
   m_Layer: 9
   m_Name: EnemySoldier
   m_TagString: Untagged
@@ -2460,51 +2456,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114112470375425680
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1337707092387824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d736febac9d8a214d8295ae9a3ff244c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114150858934624966
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1337707092387824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31d1cbfdddd8c894c880331b145accef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MovingTurnSpeed: 360
-  m_StationaryTurnSpeed: 180
-  m_JumpPower: 6
-  m_GravityMultiplier: 2
-  m_RunCycleLegOffset: 0.2
-  m_MoveSpeedMultiplier: 1
-  m_AnimSpeedMultiplier: 1
-  m_GroundCheckDistance: 0.2
-  rifling: 0
-  shooting: 0
-  equipped: 0
-  crouching: 0
---- !u!114 &114887323957193398
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1337707092387824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a78316ca603df95419bd92b24b223b94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!136 &136019385315401430
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -3260,24 +3211,3 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.37458903, y: -0.05011382, z: 0.00000013411045}
     m_Extent: {x: 0.09744415, y: 0.1395871, z: 0.45874625}
   m_DirtyAABB: 0
---- !u!195 &195383024450502026
-NavMeshAgent:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1337707092387824}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5000001
-  m_Speed: 8
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4

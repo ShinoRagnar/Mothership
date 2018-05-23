@@ -16,7 +16,8 @@ public class Senses {
     public float hearingRangeX;
     public float hearingRangeY;
 
-    public float reactionTime;
+    private float reactionTimeMax;
+    private float reactionTime;
 
     public GameUnit owner;
 
@@ -26,8 +27,19 @@ public class Senses {
         this.visionRangeY = visionRangeYVal;
         this.hearingRangeX = hearingRangeXVal;
         this.hearingRangeY = hearingRangeYVal;
-        this.reactionTime = reactionTimeVal;
+        this.reactionTimeMax = reactionTimeVal;
+
     }
+    public float GetReactionTime()
+    {
+        if(this.reactionTime == 0 && reactionTimeMax != 0)
+        {
+            this.reactionTime = reactionTimeMax / 2f+ (float)Level.instance.rand.NextDouble() * reactionTimeMax / 2f;
+            //Debug.Log(reactionTime*1000f);
+        }
+        return reactionTime;
+    }
+
     public bool CanSee(GameUnit target)
     {
         return SeeOrHear(Sense.Seeing, target);
@@ -36,6 +48,16 @@ public class Senses {
     {
         return SeeOrHear(Sense.Hearing, target);
     }
+    public static RaycastHit SeeGroundBelow(Vector3 fromPosition){
+        int layerMask = LayerMask.GetMask(Organizer.LAYER_GROUND);
+        RaycastHit hit;
+        if (Physics.Raycast(fromPosition, Vector3.down, out hit, Mathf.Infinity, layerMask))
+        {
+            return hit;
+        }
+        return new RaycastHit();
+    }
+
     public RaycastHit TryToHit(Vector3 fromPosition, GameUnit target, int tries)
     {
         RaycastHit hit;
@@ -177,6 +199,6 @@ public class Senses {
     }
     public Senses Clone()
     {
-        return new Senses(visionRangeX, visionRangeY, hearingRangeX, hearingRangeY,reactionTime);
+        return new Senses(visionRangeX, visionRangeY, hearingRangeX, hearingRangeY,reactionTimeMax);
     }
 }

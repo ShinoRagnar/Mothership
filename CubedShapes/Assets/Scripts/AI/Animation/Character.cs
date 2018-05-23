@@ -83,6 +83,10 @@ public class Character: MonoBehaviour
         leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
         rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
 
+        //float rand = (float) Level.instance.rand.NextDouble() / 5f;
+        //Debug.Log(rand);
+        //anim.SetFloat("UniqueOffset", rand);
+
     }
 
     public void UpdateWithEquippedItems()
