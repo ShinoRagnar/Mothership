@@ -18,6 +18,7 @@ public class JetPack : Item {
 
     public new void Show(Transform parent)
     {
+        //Debug.Log("SHOWING");
         leftBeam.Show(parent);
         rightBeam.Show(parent);
         Disable();

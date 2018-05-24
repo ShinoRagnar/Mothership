@@ -21,42 +21,71 @@ public class UnitFormation  {
     public static float GROUND_MARGIN = 0.5f;
 
     public PlacementStrategy currentStrategy;
-    public ArrayList placements;
-    public Dictionary<GameUnit, Vector3> placedUnits;
+
+    public Dictionary<int, Vector3> placements;
+
+    public Dictionary<GameUnit, int> placedUnits;
+
+    public Ground currentlyOn;
+    public float currentlyAtX;
 
     public int reserves;
+    public int placed;
 
     public UnitFormation(PlacementStrategy strategy)
     {
         this.currentStrategy = strategy;
-        this.placements = new ArrayList();
-        this.placedUnits = new Dictionary<GameUnit, Vector3>();
+        this.placements = new Dictionary<int, Vector3>();
+        this.placedUnits = new Dictionary<GameUnit,int>();
         this.reserves = 0;
+        this.placed = 0;
     }
-    public void Place(Vector3 placement, GameUnit unit)
+    public int Move(Ground ground, float xStart, float unitWidth)
     {
-        placedUnits.Add(unit, placement);
+        return ProjectFormationOn(ground, xStart, unitWidth, placedUnits.Count);
     }
+    public void Place(int i, GameUnit unit)
+    {
+        placedUnits.Add(unit,i);
+    }
+    public Vector3 GetMoveFor(GameUnit unit)
+    {
+        if (placedUnits.ContainsKey(unit))
+        {
+            return placements[placedUnits[unit]];
+        }
+        return Vector3.zero;
+    }
+    public Vector3 GetFormationCenter()
+    {
+        float x = currentlyAtX;
+        float y = currentlyOn.GetMidPoint().y;
+        float z = 0;
 
+        return new Vector3(x, y, z);
+    }
     public int ProjectFormationOn(Ground ground, float xStart, float unitWidth, int numberOfUnits)
     {
         reserves = 0;
+        placed = 0;
 
-        this.placements = new ArrayList();
-        this.placedUnits = new Dictionary<GameUnit, Vector3>();
+        currentlyOn = ground;
+        currentlyAtX = xStart;
 
-        float x = xStart;
-        float y = ground.GetMidPoint().y;
-        float z = 0;
+        Vector3 center = GetFormationCenter();
+
+        float x = center.x;
+        float y = center.y;
+        float z = center.z;
 
         float width = ground.obj.localScale.z - GROUND_MARGIN * 2;
         float unitsInRank = Mathf.FloorToInt(width / unitWidth);
         float maxRanks = ground.obj.localScale.x/ unitWidth;
-        //Debug.Log("Width: " + width + " unitsinRank: " + unitsInRank + " maxRanks" + maxRanks);
+        Debug.Log("Width: " + width + " unitsinRank: " + unitsInRank + " maxRanks" + maxRanks);
 
         for (int i = 0; i < unitsInRank*(maxRanks); i++)
         {
-            reserves = numberOfUnits - placements.Count;
+            reserves = numberOfUnits - placed;
             if(reserves == 0)
             {
                 break;
@@ -102,7 +131,15 @@ public class UnitFormation  {
             Vector3 placement = new Vector3(x, y, z);
             if(CanPlace(ground, placement))
             {
-                placements.Add(placement);
+                if (placements.ContainsKey(placed))
+                {
+                    placements[placed] = placement;
+                }
+                else
+                {
+                    placements.Add(placed, placement);
+                }
+                placed++;
             }
         }
         

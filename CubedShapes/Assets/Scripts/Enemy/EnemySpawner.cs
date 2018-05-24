@@ -31,15 +31,18 @@ public class EnemySpawner : MonoBehaviour {
                     unitsToSpawn
                     );
 
-                foreach(Vector3 location in ai.squad.currentFormation.placements)
+                foreach(int i in ai.squad.currentFormation.placements.Keys)
                 {
-                    ai.squad.currentFormation.Place(location,ai.AddUnit(SpawnEnemy(location)));
+
+                    ai.squad.currentFormation.Place(i,ai.AddUnit(SpawnEnemy(ai.squad.currentFormation.placements[i])));
                 }
                 ai.squad.EquipAllMembersWith(o.GUN_STANDARD_RIFLE,HumanBodyBones.RightHand);
                 ai.squad.EquipAllMembersWith(o.JETPACK_STANDARD, HumanBodyBones.UpperChest);
                 
 
                 Debug.Log("Units placed with: "+reserves+" reserves");
+
+                
 
                 spawned = true;
             }

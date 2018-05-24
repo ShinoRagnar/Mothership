@@ -70,9 +70,28 @@ public class AISquad : MonoBehaviour {
         }
         if (state == AIState.Hunting)
         {
-            squad.TellAllMembersToAimFor(target);
-            squad.TurnAllMembersTowardsTarget(target);
-            squad.TellMembersThatCanSeeToShoot(target);
+            if (IsTargetTooClose())
+            {
+                
+                state = AIState.Fleeing;
+                Dictionary<Ground, float> possibleMoves = GetPossibleMovesAtDistanceFromTarget(DISTANCE_PREFERRED);
+
+                foreach (Ground p in possibleMoves.Keys)
+                {
+                    int reserves = squad.currentFormation.Move(p, possibleMoves[p], Squad.DEFAULT_SQUAD_SOLDIER_WIDTH);
+                    Debug.Log("Fleeing to: " + p.obj.name + " but with: " + reserves + " reserves");
+                    break;
+                }
+            }
+            else { 
+                squad.TellAllMembersToAimFor(target);
+                squad.TurnAllMembersTowardsTarget(target);
+                squad.TellMembersThatCanSeeToShoot(target);
+            }
+        }
+        if(state == AIState.Fleeing)
+        {
+            squad.MoveAllSoldiers();
         }
 	}
 
@@ -95,4 +114,72 @@ public class AISquad : MonoBehaviour {
         }
         return null;
     }
+    protected Dictionary<Ground, float> GetPossibleMovesAtDistanceFromTarget(float distance)
+    {
+        Dictionary<Ground, float> possibleMoves = new Dictionary<Ground, float>();
+        // if (NavMeshAttachor.generated.ContainsKey(squad.currentFormation.currentlyOn))
+        //{
+        Ground currentGround = squad.currentFormation.currentlyOn; //NavMeshAttachor.generated[character.lastWalkedOn];
+            if (CanMoveRightToPreferredDistance(currentGround))
+            {
+                possibleMoves.Add(currentGround, target.body.position.x + distance);
+            }
+            else if (CanMoveLeftToPreferredDistance(currentGround))
+            {
+                possibleMoves.Add(currentGround, target.body.position.x - distance);
+            }
+
+            Collider[] considerations = Physics.OverlapSphere(target.body.position, distance);
+
+            foreach (Collider c in considerations)
+            {
+                if (NavMeshAttachor.generated.ContainsKey(c.transform))
+                {
+                    Ground consideration = NavMeshAttachor.generated[c.transform];
+
+                    foreach (Vector3 link in currentGround.links.Keys)
+                    {
+                        if (
+                                //TODO: Should also take Y into consideration
+                                //Move Right
+                                (
+                                squad.currentFormation.GetFormationCenter().x > target.body.position.x
+                                && link.x > target.body.position.x
+                                && currentGround.startPointToEndPoint[link].x >= link.x
+                                && currentGround.distances[link].ContainsKey(consideration)
+                                )
+                                ||
+                                // Move left
+                                (
+                                squad.currentFormation.GetFormationCenter().x < target.body.position.x
+                                && link.x < target.body.position.x
+                                && currentGround.startPointToEndPoint[link].x <= link.x
+                                && currentGround.distances[link].ContainsKey(consideration)
+                                )
+                            )
+                        {
+                            possibleMoves.Add(consideration, consideration.GetMidPoint().x);
+                        }
+                    }
+                }
+            }
+       // }
+        return possibleMoves;
+    }
+    private bool CanMoveRightToPreferredDistance(Ground on)
+    {
+        return squad.currentFormation.GetFormationCenter().x > target.body.position.x && target.body.position.x + DISTANCE_PREFERRED < on.obj.position.x + on.obj.localScale.x / 2;
+    }
+    private bool CanMoveLeftToPreferredDistance(Ground on)
+    {
+        return squad.currentFormation.GetFormationCenter().x < target.body.position.x && target.body.position.x - DISTANCE_PREFERRED > on.obj.position.x - on.obj.localScale.x / 2;
+    }
+    protected bool IsTargetTooClose()
+    {
+        return Mathf.Abs(squad.currentFormation.GetFormationCenter().x - target.body.position.x) < DISTANCE_TOO_CLOSE
+               &&
+               Mathf.Abs(squad.currentFormation.GetFormationCenter().y - target.body.position.y) < DISTANCE_TOO_CLOSE
+               ;
+    }
+
 }

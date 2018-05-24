@@ -4,22 +4,30 @@ using UnityEngine;
 
 public class Item {
 
+    private static int itemCounter = 0;
+
     public ArrayList subItems = new ArrayList();
 
     public Transform visualItem;
-    public bool showing;
-    public string itemName;
     public Transform prefab;
     public Alignment alignment;
 
-    protected ItemEquiper ie;
+    public bool showing;
+    public string itemName;
 
+    protected ItemEquiper ie;
+    public int itemNumber;
+
+    //Never use this
     public Item() { }
+
     public Item(string itemn, Transform item, Alignment alig)
     {
+        this.itemNumber = itemCounter;
         this.itemName = itemn;
         this.prefab = item;
         this.alignment = alig;
+        itemCounter++;
     }
     public void AddEquipper(ItemEquiper iteme)
     {

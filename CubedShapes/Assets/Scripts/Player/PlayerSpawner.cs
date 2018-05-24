@@ -84,7 +84,7 @@ public class PlayerSpawner : MonoBehaviour {
             GameObject threatTooClose = GameObject.CreatePrimitive(PrimitiveType.Cube);
             threatTooClose.GetComponent<BoxCollider>().enabled = false;
             threatTooClose.transform.localScale = new Vector3(AISquad.DISTANCE_TOO_CLOSE * 2, 0.5f, 0.5f);
-            threatTooClose.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 2.9f);
+            threatTooClose.transform.position = new Vector3(this.transform.position.x, this.transform.position.y+0.1f, 2.9f);
             threatTooClose.transform.parent = body.transform;
             Renderer rendToo = threatTooClose.GetComponent<Renderer>();
             rendToo.material.shader = Shader.Find("_Color");

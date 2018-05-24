@@ -557,7 +557,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d2ceb3f894f78648bd862386486683a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitsToSpawn: 26
+  unitsToSpawn: 6
   spawnDistance: 1
 --- !u!114 &318705844
 MonoBehaviour:

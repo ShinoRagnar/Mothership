@@ -33,6 +33,7 @@ public class CharacterLinkMover : MonoBehaviour
             {
                 if(characterJetpack != null)
                 {
+                    //Debug.Log("JETPACK!!");
                     characterJetpack.Enable();
                 }
                 if (method == OffMeshLinkMoveMethod.NormalSpeed)
