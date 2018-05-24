@@ -21,19 +21,29 @@ public class UnitFormation  {
     public static float GROUND_MARGIN = 0.5f;
 
     public PlacementStrategy currentStrategy;
-    public ArrayList placedUnits;
+    public ArrayList placements;
+    public Dictionary<GameUnit, Vector3> placedUnits;
+
     public int reserves;
 
     public UnitFormation(PlacementStrategy strategy)
     {
         this.currentStrategy = strategy;
-        this.placedUnits = new ArrayList();
+        this.placements = new ArrayList();
+        this.placedUnits = new Dictionary<GameUnit, Vector3>();
         this.reserves = 0;
     }
+    public void Place(Vector3 placement, GameUnit unit)
+    {
+        placedUnits.Add(unit, placement);
+    }
+
     public int ProjectFormationOn(Ground ground, float xStart, float unitWidth, int numberOfUnits)
     {
         reserves = 0;
-        placedUnits = new ArrayList();
+
+        this.placements = new ArrayList();
+        this.placedUnits = new Dictionary<GameUnit, Vector3>();
 
         float x = xStart;
         float y = ground.GetMidPoint().y;
@@ -41,13 +51,12 @@ public class UnitFormation  {
 
         float width = ground.obj.localScale.z - GROUND_MARGIN * 2;
         float unitsInRank = Mathf.FloorToInt(width / unitWidth);
-        float maxRanksLeft = Mathf.FloorToInt((ground.obj.position.x + ground.obj.localScale.x / 2) / unitWidth);
-        float maxRanksRight = Mathf.FloorToInt((ground.obj.position.x + ground.obj.localScale.x / 2) / unitWidth);
-        Debug.Log("Width: " + width + " unitsinRank: " + unitsInRank + " maxRanksLeft" + maxRanksLeft + " maxRanksRight" + maxRanksRight);
+        float maxRanks = ground.obj.localScale.x/ unitWidth;
+        //Debug.Log("Width: " + width + " unitsinRank: " + unitsInRank + " maxRanks" + maxRanks);
 
-        for (int i = 0; i < unitsInRank*(maxRanksLeft+maxRanksRight); i++)
+        for (int i = 0; i < unitsInRank*(maxRanks); i++)
         {
-            reserves = numberOfUnits - placedUnits.Count;
+            reserves = numberOfUnits - placements.Count;
             if(reserves == 0)
             {
                 break;
@@ -55,11 +64,11 @@ public class UnitFormation  {
             int currentRank = Mathf.FloorToInt(((float)i) / unitsInRank);
             int positionWithinRank = i % (int)unitsInRank;
 
-            if (currentStrategy == PlacementStrategy.LeftToRight && currentRank < maxRanksRight)
+            if (currentStrategy == PlacementStrategy.LeftToRight)
             {
                 x = xStart + currentRank * unitWidth;
             }
-            else if (currentStrategy == PlacementStrategy.LeftToRight && currentRank < maxRanksLeft)
+            else if (currentStrategy == PlacementStrategy.LeftToRight)
             {
                 x = xStart - currentRank * unitWidth;
             }
@@ -93,9 +102,8 @@ public class UnitFormation  {
             Vector3 placement = new Vector3(x, y, z);
             if(CanPlace(ground, placement))
             {
-                placedUnits.Add(placement);
+                placements.Add(placement);
             }
-            //positions.Add(new Vector3(x, y, z));
         }
         
         return reserves;

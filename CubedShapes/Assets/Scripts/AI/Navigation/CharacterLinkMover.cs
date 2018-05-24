@@ -15,11 +15,14 @@ public class CharacterLinkMover : MonoBehaviour
     public OffMeshLinkMoveMethod method = OffMeshLinkMoveMethod.Parabola;
     public float speed = 6;
     public float height = 2;
-    public JetPack characterJetpack;
+    // Owner
+    public GameUnit owner;
+    
 
     IEnumerator Start()
     {
-        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        JetPack characterJetpack = (JetPack) owner.itemEquiper.GetFirstItemOfType(typeof(JetPack));
+        NavMeshAgent agent = owner.navMeshAgent;
         agent.autoTraverseOffMeshLink = false;
         
 

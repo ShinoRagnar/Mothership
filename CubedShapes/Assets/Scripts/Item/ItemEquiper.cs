@@ -5,13 +5,28 @@ using UnityEngine;
 public class ItemEquiper : MonoBehaviour {
 
     public System.Collections.Generic.Dictionary<string, Item> equipped;
-    public Character equippedCharacter;
-    public GameUnit equippedUnit;
+    //public Character equippedCharacter;
+
+    public GameUnit owner;
 
     public void Awake()
     {
         equipped = new System.Collections.Generic.Dictionary<string, Item>();
     }
+
+    public Item GetFirstItemOfType(System.Type type)
+    {
+
+        foreach (Item g in equipped.Values)
+        {
+            if(g.GetType() == type)
+            {
+                return g;
+            }
+        }
+        return null;
+    }
+
     public void Materialize(Item i, Transform parent)
     {
         //Debug.Log(i.itemName);
@@ -31,14 +46,15 @@ public class ItemEquiper : MonoBehaviour {
         }
     }
 
-    public void EquipItem(Item i)
+    public Item EquipItem(Item i)
     {
         equipped.Add(i.itemName, i);
         i.AddEquipper(this);
-        if(equippedCharacter != null)
+        /*if(owner.character != null)
         {
-            equippedCharacter.UpdateWithEquippedItems();
-        }
+            owner.character.UpdateWithEquippedItems();
+        }*/
+        return i;
     }
 	
 	

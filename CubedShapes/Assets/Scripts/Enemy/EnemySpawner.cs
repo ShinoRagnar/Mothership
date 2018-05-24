@@ -8,7 +8,8 @@ public class EnemySpawner : MonoBehaviour {
     private Organizer o;
     public int unitsToSpawn = 6;
     public float spawnDistance = 1f;
-    bool spawned;
+
+    private bool spawned;
 
     // Use this for initialization
     void Start () {
@@ -21,33 +22,31 @@ public class EnemySpawner : MonoBehaviour {
 
             if(hit.collider != null)
             {
-                UnitFormation formation = new UnitFormation(PlacementStrategy.MiddleAndOut);
-                int reserves = formation.ProjectFormationOn(NavMeshAttachor.generated[hit.collider.transform],
-                    hit.point.x,
-                    spawnDistance,
-                    unitsToSpawn
-                    );
-                /*ArrayList placement = UnitFormation.ProjectFormationOn(
-                    PlacementStrategy.MiddleAndOut,
+                AISquad ai = this.gameObject.AddComponent<AISquad>();
+
+                int reserves = ai.squad.currentFormation.ProjectFormationOn(
                     NavMeshAttachor.generated[hit.collider.transform],
                     hit.point.x,
                     spawnDistance,
                     unitsToSpawn
-                    );*/
+                    );
 
-                foreach(Vector3 location in formation.placedUnits)
+                foreach(Vector3 location in ai.squad.currentFormation.placements)
                 {
-                    SpawnEnemy(location);
+                    ai.squad.currentFormation.Place(location,ai.AddUnit(SpawnEnemy(location)));
                 }
+                ai.squad.EquipAllMembersWith(o.GUN_STANDARD_RIFLE,HumanBodyBones.RightHand);
+                ai.squad.EquipAllMembersWith(o.JETPACK_STANDARD, HumanBodyBones.UpperChest);
+                
+
                 Debug.Log("Units placed with: "+reserves+" reserves");
-                //groundBelow = hit.collider.transform;
-                //firstSpawnX = hit.point.x;
+
                 spawned = true;
             }
         }
     }
 
-    public void SpawnEnemy(Vector3 location)
+    public GameUnit SpawnEnemy(Vector3 location)
     {
         //GameUnit
         GameUnit enemy = Organizer.ENEMY_SOLDIER_STANDARD.Clone();
@@ -56,25 +55,10 @@ public class EnemySpawner : MonoBehaviour {
         Transform enemyBody = Instantiate(o.UNIT_ENEMY_SOLDIER, this.transform);
         enemyBody.position = location;
         enemyBody.gameObject.name = enemy.uniqueName;
-        ColliderOwner co = enemyBody.gameObject.AddComponent<ColliderOwner>();
-        co.owner = enemy;
-        enemy.body = enemyBody;
 
         //Body components
-        ItemEquiper ie = enemyBody.gameObject.AddComponent<ItemEquiper>();
-        NavMeshAgent nma = enemyBody.gameObject.AddComponent<NavMeshAgent>();
-        AIController aic = enemyBody.gameObject.AddComponent<AIController>();
-        Character c = enemyBody.gameObject.AddComponent<Character>();
-
-        //Inner variables
-        c.navAgent = nma;
-        c.itemEquiper = ie;
-        ie.equippedCharacter = c;
-        ie.equippedUnit = enemy;
-        aic.character = c;
-        aic.navAgent = nma;
-        aic.itemEquiper = ie;
-
+        enemyBody.gameObject.AddComponent<ColliderOwner>();
+        enemy.RegisterBodyAndCompontentsForAgent(enemyBody);
 
         //Shield
         Transform enemyShield = Instantiate(o.P_FORCE_SHIELD, enemyBody);
@@ -88,5 +72,7 @@ public class EnemySpawner : MonoBehaviour {
         //Layer
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_ENEMY, enemyBody.gameObject);
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_SHIELDS, enemyShield.gameObject);
+
+        return enemy;
     }
 }

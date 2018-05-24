@@ -19,7 +19,7 @@ public class Gun : Item {
     {
         if (showing) {
 
-            RaycastHit hit = ie.equippedUnit.senses.TryToHit(muzzle.visualItem.transform.position, target, Senses.MAX_RAY_CASTS_WHEN_TRY_TO_SEE);
+            RaycastHit hit = ie.owner.senses.TryToHit(muzzle.visualItem.transform.position, target, Senses.MAX_RAY_CASTS_WHEN_TRY_TO_SEE);
             if(hit.collider != null)
             {
                 Forge3D.Forcefield ffHit = hit.collider.transform.GetComponentInParent<Forge3D.Forcefield>();

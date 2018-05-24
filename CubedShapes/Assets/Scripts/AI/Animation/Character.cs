@@ -2,11 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine.AI;
 
+public enum ArmState
+{
+    Idle,
+    Aiming
+}
+public enum BodyState
+{
+    Standing,
+    Jumping,
+    Crouching
+}
+public enum GunState
+{
+    Idle,
+    Shooting
+}
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
 public class Character: MonoBehaviour
 {
+    //Variables
     [SerializeField] float m_MovingTurnSpeed = 360;
     [SerializeField] float m_StationaryTurnSpeed = 180;
     [SerializeField] float m_JumpPower = 6f;
@@ -27,14 +44,14 @@ public class Character: MonoBehaviour
 
     //Public
     public float stationaryTurnMultiplier = 3;
-    public bool isGrounded;
+    //public bool isGrounded;
     public Transform lastWalkedOn;
 
     // Animation states
-    public bool rifling;
+    /*public bool rifling;
     public bool shooting;
     public bool equipped;
-    public bool crouching;
+    public bool crouching;*/
 
     //Head IK
     private float lookIKWeight;
@@ -46,50 +63,69 @@ public class Character: MonoBehaviour
     //Foot IK
     private Transform leftFoot;
     private Transform rightFoot;
-    //Hand IK
-    //private Transform rightHand;
-    //Head IK
+
+
     private GameUnit lookingAt;
 
+    //Owner
+    public GameUnit owner;
+
+    //State
+    public ArmState armState;
+    public BodyState bodyState;
+    public GunState gunState;
+
+    //Reactions
+    public float reactionTime;
+    public float currentReactionCycle;
+
+    public void Update()
+    {
+        currentReactionCycle += Time.deltaTime;
+    }
+    public bool ShouldAct()
+    {
+        return currentReactionCycle >= reactionTime;
+    }
+
     // Components
-    public ItemEquiper itemEquiper;
-    private Rigidbody rigid;
-    private Animator anim;
-    private CapsuleCollider capsule;
-    public NavMeshAgent navAgent;
-    private CharacterLinkMover linkMover;
+    /* public ItemEquiper itemEquiper;
+     private Rigidbody rigid;
+     private Animator anim;
+     private CapsuleCollider capsule;
+     public NavMeshAgent navAgent;
+     private CharacterLinkMover linkMover;*/
 
 
-    public void Awake()
+    /*public void Awake()
     {
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
         linkMover = this.gameObject.AddComponent<CharacterLinkMover>();
-    }
+    }*/
 
     void Start()
     {
-        
-        rifling = false;
-        shooting = false;
+        armState = ArmState.Idle;
+        bodyState = BodyState.Standing;
+        gunState = GunState.Idle;
 
-        capsuleHeight = capsule.height;
-        capsuleCenter = capsule.center;
+        /*rifling = false;
+        shooting = false;*/
 
-        rigid.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+        capsuleHeight = this.owner.collider.height;
+        capsuleCenter = this.owner.collider.center;
+
+        this.owner.rigid.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
         origGroundCheckDistance = m_GroundCheckDistance;
 
-        leftFoot = anim.GetBoneTransform(HumanBodyBones.LeftFoot);
-        rightFoot = anim.GetBoneTransform(HumanBodyBones.RightFoot);
-
-        //float rand = (float) Level.instance.rand.NextDouble() / 5f;
-        //Debug.Log(rand);
-        //anim.SetFloat("UniqueOffset", rand);
+        leftFoot = this.owner.animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+        rightFoot = this.owner.animator.GetBoneTransform(HumanBodyBones.RightFoot);
 
     }
 
-    public void UpdateWithEquippedItems()
+    /*public void UpdateWithEquippedItems()
     {
         foreach (Item j in itemEquiper.equipped.Values)
         {
@@ -99,7 +135,7 @@ public class Character: MonoBehaviour
                 break;
             }
         }
-    }
+    }*/
 
     public void LookAt(GameUnit lookTarget)
     {
@@ -111,7 +147,7 @@ public class Character: MonoBehaviour
         clampWeight = 1;
     }
 
-    public void Move(Vector3 move, bool crouch, bool jump)
+    public void Move(Vector3 move)
     {
         if (move.magnitude > 1f) move.Normalize();
         move = transform.InverseTransformDirection(move);
@@ -123,16 +159,20 @@ public class Character: MonoBehaviour
         ApplyExtraTurnRotation();
 
         // control and velocity handling is different when grounded and airborne:
-        if (isGrounded)
+        if (!IsGrounded())
+        {
+            HandleAirborneMovement();
+        }
+        /*if (IsGrounded())
         {
             HandleGroundedMovement(crouch, jump);
         }
         else
         {
             HandleAirborneMovement();
-        }
+        }*/
 
-        ScaleCapsuleForCrouching(crouch);
+        ScaleCapsuleForCrouching(bodyState == BodyState.Crouching);
         PreventStandingInLowHeadroom();
 
         // send input and other state parameters to the animator
@@ -141,52 +181,54 @@ public class Character: MonoBehaviour
 
     public void Bullet()
     {
-        foreach (Item g in itemEquiper.equipped.Values)
+        Gun g = (Gun)owner.itemEquiper.GetFirstItemOfType(typeof(Gun));// owner.itemEquiper.GetFirstGun();
+
+        if (lookingAt != null && g != null)
         {
-            if (g is Gun)
-            {
-                if (lookingAt != null)
-                {
-                    ((Gun)g).ShootAt(lookingAt);
-                }
-            }
+            
+            g.ShootAt(lookingAt);
         }
+
     }
 
     void ScaleCapsuleForCrouching(bool crouch)
     {
-        if (isGrounded && crouch)
+        if (IsGrounded() && crouch)
         {
-            if (crouching) return;
-            capsule.height = capsule.height / 2f;
-            capsule.center = capsule.center / 2f;
-            crouching = true;
+            if (bodyState == BodyState.Crouching) return; //(crouching) return;
+            this.owner.collider.height = this.owner.collider.height / 2f;
+            this.owner.collider.center = this.owner.collider.center / 2f;
+            bodyState = BodyState.Crouching;
+            //crouching = true;
         }
         else
         {
-            Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
-            float crouchRayLength = capsuleHeight - capsule.radius * k_Half;
-            if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            Ray crouchRay = new Ray(this.owner.rigid.position + Vector3.up * this.owner.collider.radius * k_Half, Vector3.up);
+            float crouchRayLength = capsuleHeight - this.owner.collider.radius * k_Half;
+            if (Physics.SphereCast(crouchRay, this.owner.collider.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
-                crouching = true;
+                bodyState = BodyState.Crouching;
+                //crouching = true;
                 return;
             }
-            capsule.height = capsuleHeight;
-            capsule.center = capsuleCenter;
-            crouching = false;
+            this.owner.collider.height = capsuleHeight;
+            this.owner.collider.center = capsuleCenter;
+            bodyState = BodyState.Standing;
+            //crouching = false;
         }
     }
 
     void PreventStandingInLowHeadroom()
     {
         // prevent standing up in crouch-only zones
-        if (!crouching)
+        if (bodyState != BodyState.Crouching)//!crouching)
         {
-            Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * k_Half, Vector3.up);
-            float crouchRayLength = capsuleHeight - capsule.radius * k_Half;
-            if (Physics.SphereCast(crouchRay, capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            Ray crouchRay = new Ray(this.owner.rigid.position + Vector3.up * this.owner.collider.radius * k_Half, Vector3.up);
+            float crouchRayLength = capsuleHeight - this.owner.collider.radius * k_Half;
+            if (Physics.SphereCast(crouchRay, this.owner.collider.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
             {
-                crouching = true;
+                bodyState = BodyState.Crouching;
+                //crouching = true;
             }
         }
     }
@@ -195,74 +237,68 @@ public class Character: MonoBehaviour
     {
         if (lookingAt != null)
         {
-            anim.SetLookAtWeight(lookIKWeight, bodyWeight, headWeight, eyesWeight, clampWeight);
-            anim.SetLookAtPosition(lookingAt.body.position);
-            // Debug.Log(lookingAt.position);
+            this.owner.animator.SetLookAtWeight(lookIKWeight, bodyWeight, headWeight, eyesWeight, clampWeight);
+            this.owner.animator.SetLookAtPosition(lookingAt.body.position);
         }
         if (forwardAmount == 0 && turnAmount == 0)
         {
-            anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
-            anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
-            anim.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot.position);
-            anim.SetIKPosition(AvatarIKGoal.RightFoot, rightFoot.position);
+            this.owner.animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
+            this.owner.animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+            this.owner.animator.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot.position);
+            this.owner.animator.SetIKPosition(AvatarIKGoal.RightFoot, rightFoot.position);
         }
         else
         {
-            anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
-            anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
+            this.owner.animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
+            this.owner.animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
         }
-        /*
-        if (rifling && equippedWeapon != null)
+    }
+    public void UpdateAnimatorState()
+    {
+        this.owner.animator.SetBool("Crouch", bodyState == BodyState.Crouching); //crouching);
+        this.owner.animator.SetBool("OnGround", IsGrounded());
+        this.owner.animator.SetBool("Rifling", armState == ArmState.Aiming); //rifling);
+        this.owner.animator.SetBool("Shooting", gunState == GunState.Shooting); //shooting);
+
+        if (!IsGrounded())
         {
-            m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-            m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
-            m_Animator.SetIKPosition(AvatarIKGoal.LeftHand, equippedWeapon.position);
-            m_Animator.SetIKPosition(AvatarIKGoal.RightHand, equippedWeapon.position);
+
+            this.owner.animator.SetFloat("Jump", this.owner.rigid.velocity.y);
         }
-        else
-        {
-            m_Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
-            m_Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
-        }*/
+
     }
 
     void UpdateAnimator(Vector3 move)
     {
         // update the animator parameters
-        anim.SetFloat("Forward", forwardAmount, 0.1f, Time.deltaTime);
-        anim.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
-        anim.SetBool("Crouch", crouching);
-        anim.SetBool("OnGround", isGrounded);
-        anim.SetBool("Rifling", rifling);
-        anim.SetBool("Shooting", shooting);
-        if (!isGrounded)
-        {
+        this.owner.animator.SetFloat("Forward", forwardAmount, 0.1f, Time.deltaTime);
+        this.owner.animator.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
+        UpdateAnimatorState();
 
-            anim.SetFloat("Jump", rigid.velocity.y);
-        }
+
 
         // calculate which leg is behind, so as to leave that leg trailing in the jump animation
         // (This code is reliant on the specific run cycle offset in our animations,
         // and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
         float runCycle =
             Mathf.Repeat(
-                anim.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
+                this.owner.animator.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
         float jumpLeg = (runCycle < k_Half ? 1 : -1) * forwardAmount;
-        if (isGrounded)
+        if (IsGrounded())
         {
-            anim.SetFloat("JumpLeg", jumpLeg);
+            this.owner.animator.SetFloat("JumpLeg", jumpLeg);
         }
 
         // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
         // which affects the movement speed because of the root motion.
-        if (isGrounded && move.magnitude > 0)
+        if (IsGrounded() && move.magnitude > 0)
         {
-            anim.speed = m_AnimSpeedMultiplier;
+            this.owner.animator.speed = m_AnimSpeedMultiplier;
         }
         else
         {
             // don't use that while airborne
-            anim.speed = 1;
+            this.owner.animator.speed = 1;
         }
     }
 
@@ -271,22 +307,22 @@ public class Character: MonoBehaviour
         // apply extra gravity from multiplier:
         
         Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
-        rigid.AddForce(extraGravityForce);
+        this.owner.rigid.AddForce(extraGravityForce);
 
-        m_GroundCheckDistance = rigid.velocity.y < 0 ? origGroundCheckDistance : 0.01f;
+        m_GroundCheckDistance = this.owner.rigid.velocity.y < 0 ? origGroundCheckDistance : 0.01f;
     }
 
     void HandleGroundedMovement(bool crouch, bool jump)
     {
         // check whether conditions are right to allow a jump:
-        if (jump && !crouch && anim.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
+        /*if (jump && !crouch && this.owner.animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
         {
             // jump!
-            rigid.velocity = new Vector3(rigid.velocity.x, m_JumpPower, rigid.velocity.z);
+            this.owner.rigid.velocity = new Vector3(this.owner.rigid.velocity.x, m_JumpPower, this.owner.rigid.velocity.z);
             isGrounded = false;
-            anim.applyRootMotion = false;
+            this.owner.animator.applyRootMotion = false;
             m_GroundCheckDistance = 0.1f;
-        }
+        }*/
     }
 
     void ApplyExtraTurnRotation()
@@ -306,25 +342,25 @@ public class Character: MonoBehaviour
     {
         // we implement this function to override the default root motion.
         // this allows us to modify the positional speed before it's applied.
-        if (isGrounded && Time.deltaTime > 0)
+        if (IsGrounded() && Time.deltaTime > 0)
         {
-            Vector3 v = (anim.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+            Vector3 v = (this.owner.animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
 
             // we preserve the existing y part of the current velocity.
-            v.y = rigid.velocity.y;
-            rigid.velocity = v;
+            v.y = this.owner.rigid.velocity.y;
+            this.owner.rigid.velocity = v;
         }
     }
     public bool IsGrounded()
     {
-        return !navAgent.isOnOffMeshLink;
+        return !this.owner.navMeshAgent.isOnOffMeshLink;
     }
     private void CheckGroundStatus()
     {
         if (IsGrounded())
         {
-            isGrounded = true;
-            anim.applyRootMotion = true;
+            //isGrounded = true;
+            this.owner.animator.applyRootMotion = true;
             RaycastHit hitInfo;
             int layer_mask = LayerMask.GetMask(Organizer.LAYER_GROUND);
 
@@ -336,9 +372,9 @@ public class Character: MonoBehaviour
 
         }else{
             
-            isGrounded = false;
+            //isGrounded = false;
             groundNormal = Vector3.up;
-            anim.applyRootMotion = false;
+            this.owner.animator.applyRootMotion = false;
         }
     }
 }

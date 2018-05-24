@@ -72,7 +72,7 @@ public class PlayerSpawner : MonoBehaviour {
         if (DevelopmentSettings.SHOW_THREAT_LEVELS) { 
             GameObject threatPreferred = GameObject.CreatePrimitive(PrimitiveType.Cube);
             threatPreferred.GetComponent<BoxCollider>().enabled = false;
-            threatPreferred.transform.localScale = new Vector3(AIController.DISTANCE_PREFERRED * 2, 0.5f, 0.5f);
+            threatPreferred.transform.localScale = new Vector3(AISquad.DISTANCE_PREFERRED * 2, 0.5f, 0.5f);
             threatPreferred.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 3);
             threatPreferred.transform.parent = body.transform;
             Renderer rend = threatPreferred.GetComponent<Renderer>();
@@ -83,7 +83,7 @@ public class PlayerSpawner : MonoBehaviour {
 
             GameObject threatTooClose = GameObject.CreatePrimitive(PrimitiveType.Cube);
             threatTooClose.GetComponent<BoxCollider>().enabled = false;
-            threatTooClose.transform.localScale = new Vector3(AIController.DISTANCE_TOO_CLOSE * 2, 0.5f, 0.5f);
+            threatTooClose.transform.localScale = new Vector3(AISquad.DISTANCE_TOO_CLOSE * 2, 0.5f, 0.5f);
             threatTooClose.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 2.9f);
             threatTooClose.transform.parent = body.transform;
             Renderer rendToo = threatTooClose.GetComponent<Renderer>();
