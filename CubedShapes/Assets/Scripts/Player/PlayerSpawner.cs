@@ -91,6 +91,17 @@ public class PlayerSpawner : MonoBehaviour {
             rendToo.material.SetColor("_Color", Color.red);
             rendToo.material.shader = Shader.Find("Specular");
             rendToo.material.SetColor("_SpecColor", Color.red);
+
+            GameObject threatLastStand = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            threatLastStand.GetComponent<BoxCollider>().enabled = false;
+            threatLastStand.transform.localScale = new Vector3(AISquad.DISTANCE_LAST_STAND * 2, 0.5f, 0.5f);
+            threatLastStand.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 0.2f, 2.8f);
+            threatLastStand.transform.parent = body.transform;
+            Renderer rendLast = threatLastStand.GetComponent<Renderer>();
+            rendLast.material.shader = Shader.Find("_Color");
+            rendLast.material.SetColor("_Color", Color.black);
+            rendLast.material.shader = Shader.Find("Specular");
+            rendLast.material.SetColor("_SpecColor", Color.black);
         }
     }
 }

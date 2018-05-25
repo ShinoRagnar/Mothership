@@ -15,10 +15,12 @@ public class AISquad : MonoBehaviour {
     public static float DISTANCE_INCREASE_PER_SEARCH = 10;
 
     public static float DISTANCE_PREFERRED = 20;
-    public static float DISTANCE_TOO_CLOSE = 10;
+    public static float DISTANCE_TOO_CLOSE = 12;
+    public static float DISTANCE_LAST_STAND = 7;
 
-    public static float IDLE_REACTION_TIME = 0.5f;
-    public static float RECALCULATE_POSITIONS = 1;
+    public static float IDLE_REACTION_TIME = 0.25f;
+    public static float RECALCULATE_POSITIONS = 0.75f;
+    public static float REACTION_RANDOM_VARIANCE = 0.25f;
     public static int NUMBER_OF_SQUAD_MEMBERS_TO_LOOK_WHEN_IDLE = 3;
 
     public Squad squad;
@@ -28,12 +30,20 @@ public class AISquad : MonoBehaviour {
 
     public GameUnit target;
 
+    public float idleTime = IDLE_REACTION_TIME;
+    public float recalcPositionsTime = RECALCULATE_POSITIONS;
+
+    //Framebased variables
+    bool movedLastFrame = false;
+
     public AISquad()
     {
         squad = new Squad();
         state = AIState.Idle;
         timeSinceLastChange = 0;
         enemyToThisSquad = Organizer.FACTION_PLAYER;
+        idleTime = GetRandomVariance(IDLE_REACTION_TIME);
+        recalcPositionsTime = GetRandomVariance(RECALCULATE_POSITIONS);
     }
 
     public GameUnit AddUnit(GameUnit gu)
@@ -48,6 +58,10 @@ public class AISquad : MonoBehaviour {
         }
         return gu;
     }
+    public float GetRandomVariance(float orig)
+    {
+        return orig+(float)Level.instance.rand.NextDouble() * REACTION_RANDOM_VARIANCE;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -56,7 +70,7 @@ public class AISquad : MonoBehaviour {
 
         if (state == AIState.Idle)
         {
-            if(timeSinceLastChange > IDLE_REACTION_TIME)
+            if(timeSinceLastChange > idleTime)
             {
                 timeSinceLastChange = 0;
                 for(int i = 0; i < Mathf.Min(squad.members.Count, NUMBER_OF_SQUAD_MEMBERS_TO_LOOK_WHEN_IDLE); i++)
@@ -74,17 +88,13 @@ public class AISquad : MonoBehaviour {
         }
         else
         {
-            if (timeSinceLastChange > RECALCULATE_POSITIONS)
+            if (timeSinceLastChange > recalcPositionsTime)
             {
                 timeSinceLastChange = 0;
-                squad.currentFormation.RecalculateClosestPositions();
-            }
 
-            if (state == AIState.Hunting)
-            {
                 if (IsTargetTooClose())
                 {
-                    
+
                     Dictionary<Ground, float> possibleMoves;
                     int placed = 0;
                     int reserves = 0;
@@ -98,30 +108,34 @@ public class AISquad : MonoBehaviour {
                         {
                             reserves = squad.currentFormation.Move(p, possibleMoves[p], placed, Squad.DEFAULT_SQUAD_SOLDIER_WIDTH);
                             placed = squad.members.Count - reserves;
-                            Debug.Log(placed + " soldiers going to: " + p.obj.name);
+                            //Debug.Log(placed + " soldiers going to: " + p.obj.name);
                             if (reserves == 0)
                             {
                                 break;
                             }
                         }
-                        if(possibleMoves.Count > 0 && reserves == 0)
+                        if (possibleMoves.Count > 0 && reserves == 0)
                         {
                             break;
                         }
                     }
-                    
-                    Debug.Log("Reserves after search: "+reserves);
-
                     squad.currentFormation.RecalculateClosestPositions();
-
+                }else if (movedLastFrame) {
+                    Debug.Log("Recalculating positions");
+                    squad.currentFormation.RecalculateClosestPositions();
                 }
+            }
+
+            if (state == AIState.Hunting)
+            {
+               
                 squad.TellAllMembersToAimFor(target);
                 squad.TurnAllMembersTowardsTarget(target);
                 squad.TellMembersThatCanSeeToShoot(target);
                 
             }
 
-            squad.UpdateCharacterMove(target,DISTANCE_PREFERRED);
+            movedLastFrame = squad.UpdateCharacterMove(target,DISTANCE_PREFERRED,DISTANCE_LAST_STAND);
         }
       
 	}

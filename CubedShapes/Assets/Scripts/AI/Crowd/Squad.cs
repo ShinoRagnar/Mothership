@@ -43,11 +43,16 @@ public class Squad {
         members = new List<GameUnit>();
         activeSquads.Add(this, name);
     }
-    public void UpdateCharacterMove(GameUnit target, float acceptableStoppingDistanceFromTarget)
+    public bool UpdateCharacterMove(GameUnit target, float preferredDistance, float insideLastStand)
     {
+        bool moved = false;
+
         foreach (GameUnit member in members)
         {
-            if (IsTargetTooClose(target, member.body.position.x, member.body.position.y, acceptableStoppingDistanceFromTarget))
+            if(IsTargetTooClose(target, member.body.position.x, member.body.position.y, insideLastStand)){
+                member.navMeshAgent.SetDestination(member.body.position);
+
+            }else if (IsTargetTooClose(target, member.body.position.x, member.body.position.y, preferredDistance))
             {
                 member.navMeshAgent.SetDestination(currentFormation.GetMoveFor(member));
             }
@@ -65,12 +70,14 @@ public class Squad {
             if (member.navMeshAgent.remainingDistance > member.navMeshAgent.stoppingDistance)
             {
                 member.character.Move(member.navMeshAgent.desiredVelocity);
+                moved = true;
             }
             else
             {
                 member.character.Move(Vector3.zero);
             }
         }
+        return moved;
 
     }
     /*public bool MoveAllSoldiers()

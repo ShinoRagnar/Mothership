@@ -29,6 +29,7 @@ public class NavMeshAttachor : MonoBehaviour {
 
     private static int LINK_MULTIPLIER = 5;
     public static float MULTI_LINK_DISTANCE = 1;
+    public static float MULTI_INNER_LINK_DISTANCE = 0.1f;
 
     // Use this for initialization
     void Start () {
@@ -190,8 +191,8 @@ public class NavMeshAttachor : MonoBehaviour {
             {
                 NavMeshLink navLink = mid.AddComponent<NavMeshLink>();
                 
-                navLink.startPoint = new Vector3((from.position.x - to.position.x) / 2, (from.position.y - to.position.y) / 2, z); //leftLink.transform.position;
-                navLink.endPoint = new Vector3(-(from.position.x - to.position.x) / 2, -(from.position.y - to.position.y) / 2, z);
+                navLink.startPoint = new Vector3((from.position.x - to.position.x) / 2, (from.position.y - to.position.y) / 2, z+ MULTI_INNER_LINK_DISTANCE*i); //leftLink.transform.position;
+                navLink.endPoint = new Vector3(-(from.position.x - to.position.x) / 2, -(from.position.y - to.position.y) / 2, z+ MULTI_INNER_LINK_DISTANCE*i);
             }
         }
         //navLink.width = );
