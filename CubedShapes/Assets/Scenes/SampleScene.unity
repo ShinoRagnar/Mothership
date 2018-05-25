@@ -143,7 +143,7 @@ RectTransform:
   m_Father: {fileID: 739766548}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.95}
+  m_AnchorMin: {x: 0, y: 0.93}
   m_AnchorMax: {x: 1, y: 0.99}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
@@ -851,7 +851,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -969,8 +969,10 @@ MonoBehaviour:
     type: 2}
   P_SFI_WALL_LOW_WINDOW_DOUBLE: {fileID: 437168, guid: 86585d76e11d8934c8b8edc544a198ee,
     type: 2}
-  BUFFS:
-  - {fileID: 224048343519536900, guid: 882bc08ac43096c479bcce7e9fa158fd, type: 2}
+  UI_BUFF_ARROW_LEFT: {fileID: 224274608476331936, guid: c15888f91e798e8499796b37f3b485e1,
+    type: 2}
+  UI_BUFF_ARROW_RIGHT: {fileID: 224283367404008740, guid: 5734a564fa679344590ce0ee95be465c,
+    type: 2}
   P_SFI_GROUND:
   - {fileID: 475816, guid: e1257e5d18870e940aa885eb59d86429, type: 2}
   - {fileID: 493336, guid: 33b9017c8d7f91a499679ab6535ff9c7, type: 2}

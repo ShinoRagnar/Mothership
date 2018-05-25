@@ -16,12 +16,14 @@ public class GameUnit{
     public Rigidbody rigid;
     public CapsuleCollider collider;
     public CharacterLinkMover characterLinkMover;
-   
+
     // Common
     public Faction belongsToFaction;
     public Health health;
     public Senses senses;
     public Transform body;
+    public BuffHandler buffHandler;
+
 
     // Not used?
     public float weight;
@@ -31,8 +33,11 @@ public class GameUnit{
     public string unitName;
     public string uniqueName;
 
+    //Player?
+    public bool isPlayer;
+
     
-    public GameUnit(string unitNameVal, Faction f, Health h, Senses s, float weightVal, float headYOffsetVal)
+    public GameUnit(string unitNameVal, Faction f, Health h, Senses s, float weightVal, float headYOffsetVal, bool isPlayerVal)
     {
         this.belongsToFaction = f;
         this.health = h;
@@ -48,12 +53,21 @@ public class GameUnit{
         uniqueName = unitName + activeUnits[unitName];
         unitsByFaction[f].Add(this);
         s.owner = this;
+        isPlayer = isPlayerVal;
     }
     
     public GameUnit Clone()
     {
         
-        return new GameUnit(unitName, belongsToFaction, health.Clone(),senses.Clone(),  weight, headYOffset);
+        return new GameUnit(unitName, belongsToFaction, health.Clone(),senses.Clone(),  weight, headYOffset, isPlayer);
+    }
+    public void AddCommonComponents()
+    {
+        buffHandler = this.body.gameObject.AddComponent<BuffHandler>();
+        buffHandler.owner = this;
+        ColliderOwner col = this.body.gameObject.AddComponent<ColliderOwner>();
+        col.owner = this;
+       // buffHandler.Test();
     }
 
     public void RegisterBodyAndCompontentsForAgent(Transform bodyVal)

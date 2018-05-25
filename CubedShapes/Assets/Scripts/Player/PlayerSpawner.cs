@@ -37,9 +37,12 @@ public class PlayerSpawner : MonoBehaviour {
         body.AddComponent<PlayerMovement>();
         body.AddComponent<CharacterController>();
         body.AddComponent<NavMeshObstacle>();
-        ColliderOwner coPlay = body.AddComponent<ColliderOwner>();
-        coPlay.owner = player;
+        //ColliderOwner coPlay = body.AddComponent<ColliderOwner>();
+        //coPlay.owner = player;
         player.body = playerBody;
+        // Register common gameunit components
+        player.AddCommonComponents();
+
 
         //Focus
         GameObject focus = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -68,10 +71,6 @@ public class PlayerSpawner : MonoBehaviour {
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_PLAYER, playerNode.gameObject);
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_SHIELDS, playerShield.gameObject);
 
-        // TEST to be deleted
-        GameObject go = GameObject.Find("Debuff");
-        Transform gg = Instantiate(o.BUFFS[0]);
-        gg.SetParent(go.transform, false);
 
         
 

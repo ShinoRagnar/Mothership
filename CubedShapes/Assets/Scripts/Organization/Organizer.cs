@@ -12,6 +12,7 @@ public class Organizer : MonoBehaviour {
     // ---------------------- STRINGS
     //GameObjects
     public static string NAME_MAIN_CAMERA = "MainCamera";
+    public static string NAME_DEBUFF_PANEL = "Debuff";
     public static string NAME_MAIN_FOCUS = "CameraFocus";
     public static string NAME_PLAYER_GAMEOBJECT = "Player";
     //String parts
@@ -67,13 +68,10 @@ public class Organizer : MonoBehaviour {
     public Transform P_SFI_WALL_LOW_DOUBLE;
     public Transform P_SFI_WALL_LOW_WINDOW;
     public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
+
     //Images
-    public Transform[] BUFFS;
-    
-
-    //Visor
-    //public Transform P_VISOR_STANDARD_ORANGE;
-
+    public Transform UI_BUFF_ARROW_LEFT;
+    public Transform UI_BUFF_ARROW_RIGHT;
 
 
     //Ground Tiles
@@ -104,8 +102,12 @@ public class Organizer : MonoBehaviour {
     public Gun  GUN_STANDARD_RIFLE;
     public Item MUZZLE_STANDARD_RIFLE;
 
-    //Visors
-    //public Visor STANDARD_SOLDIER_VISOR;
+    //Buffs
+    public Buff BUFF_SLOWED_LEFT;
+    public Buff BUFF_SLOWED_RIGHT;
+
+
+    //------------- STATICS --------------------
 
     //Senses
     public static Senses STANDARD_HUMANOID_SENSES = new Senses(100, 20, 15, 15, 0.5f);
@@ -117,12 +119,11 @@ public class Organizer : MonoBehaviour {
 
     //Soldiers
     public static Health ENEMY_SOLDIER_STANDARD_HEALTH = new Health(100, 200, 0, 1);
-    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, STANDARD_HUMANOID_SENSES, 100,2);
+    public static GameUnit ENEMY_SOLDIER_STANDARD = new GameUnit("Standard Enemy Soldier ", FACTION_ENEMY, ENEMY_SOLDIER_STANDARD_HEALTH, STANDARD_HUMANOID_SENSES, 100,2,false);
 
     //Player
     public static Health PLAYER_STANDARD_HEALTH = new Health(1000, 2000, 1, 10);
-    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, STANDARD_ROBOT_SENSES, 1000, 1);
-
+    public static GameUnit PLAYER_STANDARD_SETUP = new GameUnit("Player", FACTION_PLAYER, PLAYER_STANDARD_HEALTH, STANDARD_ROBOT_SENSES, 1000, 1,true);
 
 
 
@@ -144,20 +145,18 @@ public class Organizer : MonoBehaviour {
     {
         instance = this;
         //DestroyImmediate(E_MUZZLE_FLASHES[0].Find("Distortion").gameObject,true);
-        CreateGameLogicObjects();
         CreateItems();
-
-
     }
-    private void CreateGameLogicObjects()
-    {
-       
-    }
+
 
     private void CreateItems()
     {
-        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(0.4f, 0, 0.2f, 180, 0, 0, 0, 0, 0));
+        //Buffs
+        instance.BUFF_SLOWED_LEFT = new Buff("Slowed Left", 2, UI_BUFF_ARROW_LEFT, true);
+        instance.BUFF_SLOWED_RIGHT = new Buff("Slowed Right", 2, UI_BUFF_ARROW_RIGHT, true);
 
+        //Guns
+        instance.MUZZLE_STANDARD_RIFLE = new Item("Muzzle Standard Rifle", E_MUZZLE_FLASHES[0], new Alignment(0.4f, 0, 0.2f, 180, 0, 0, 0, 0, 0));
         instance.GUN_STANDARD_RIFLE = new Gun(
             "Standard Rifle",
             P_SFI_RIFLES[0],
@@ -165,11 +164,16 @@ public class Organizer : MonoBehaviour {
             new Vector3(2, 0, 0),
             MUZZLE_STANDARD_RIFLE
             );
+        instance.GUN_STANDARD_RIFLE.AddBuffToTransferOnShot(BUFF_SLOWED_LEFT,-1);
+        instance.GUN_STANDARD_RIFLE.AddBuffToTransferOnShot(BUFF_SLOWED_RIGHT, 1);
+
+        //Jetpacks
         instance.JET_BEAMER_STANDARD_LEFT = new Item("Jet Beamer Soldier Standard Left", E_JET_BEAMS[1], new Alignment(-0.1f, 0, -0.2f, 171.32f, -116.13f, -84.89f, -0.6f, -0.6f, -0.4f));
         instance.JET_BEAMER_STANDARD_RIGHT = new Item("Jet Beamer Soldier Standard Right", E_JET_BEAMS[1], new Alignment(0.1f, 0, -0.2f, -5, 121, 11, -0.6f, -0.6f, -0.4f));
         instance.JETPACK_STANDARD = new JetPack("Jetpack Soldier Standard", instance.JET_BEAMER_STANDARD_LEFT, instance.JET_BEAMER_STANDARD_RIGHT);
+        
 
-        //instance.STANDARD_SOLDIER_VISOR = new Visor("Standard Visor Orange", P_VISOR_STANDARD_ORANGE, new Alignment(0, 0, 0, 90, 0, 0, 0, 0, 0));
+
 
     }
 }

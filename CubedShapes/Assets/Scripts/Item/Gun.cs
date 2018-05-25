@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class Gun : Item {
 
+    public static int RAYCASTS_WHEN_SHOOTING = 1;
+
     public Vector3 gunpoint;
     public Item muzzle;
+    public Dictionary<Buff, float> transferringBuffs;
     
     public Gun(string name, Transform item, Alignment align, Vector3 gunp, Item muzzl)
     {
@@ -14,14 +17,22 @@ public class Gun : Item {
         this.alignment = align;
         this.gunpoint = gunp;
         this.muzzle = muzzl;
+        this.transferringBuffs = new Dictionary<Buff, float>();
     }
+    public void AddBuffToTransferOnShot(Buff b, float direction)
+    {
+        transferringBuffs.Add(b,direction);
+    }
+
     public void ShootAt(GameUnit target)
     {
         if (showing) {
 
-            RaycastHit hit = ie.owner.senses.TryToHit(muzzle.visualItem.transform.position, target, Senses.MAX_RAY_CASTS_WHEN_TRY_TO_SEE);
+            RaycastHit hit = ie.owner.senses.TryToHit(muzzle.visualItem.transform.position, target, RAYCASTS_WHEN_SHOOTING);
             if(hit.collider != null)
             {
+                
+                //Hit shield
                 Forge3D.Forcefield ffHit = hit.collider.transform.GetComponentInParent<Forge3D.Forcefield>();
                 if (ffHit != null)
                 {
@@ -29,6 +40,31 @@ public class Gun : Item {
                     ffHit.OnHit(hit.point, hitPower);
                     //Debug.Log("Shooting at: " + Time.time);
                 }
+                //Transfer debuffs
+                ColliderOwner colo = hit.collider.transform.GetComponent<ColliderOwner>();
+                if(colo != null)
+                {
+                    if(colo.owner.buffHandler != null)
+                    {
+                        foreach (Buff buff in transferringBuffs.Keys)
+                        {
+                            float direction = transferringBuffs[buff];
+                            //Transfer directional buffs in the correct direction
+                            if(
+                                (colo.owner.body.position.x < ie.owner.body.position.x && direction < 0)
+                                ||
+                                (colo.owner.body.position.x > ie.owner.body.position.x && direction > 0)
+                                ||
+                                direction == 0
+                                )
+                            {
+                                colo.owner.buffHandler.AddBuff(ie.owner.uniqueName, buff);
+                            }
+                            
+                        }
+                    }
+                }
+
             }
             /*RaycastHit hit;
             Vector3 fromPosition = muzzle.visualItem.transform.position;
@@ -52,7 +88,13 @@ public class Gun : Item {
     }
     public new Gun Clone()
     {
-        return new Gun(itemName, prefab, alignment, gunpoint, muzzle.Clone());//new Item(muzzle.itemName,muzzle.prefab,muzzle.alignment));
+        Gun g = new Gun(itemName, prefab, alignment, gunpoint, muzzle.Clone());
+        foreach(Buff b in transferringBuffs.Keys)
+        {
+            g.transferringBuffs.Add(b,transferringBuffs[b]);
+        }
+        return g;
+
     }
 
 }
