@@ -27,6 +27,9 @@ public class NavMeshAttachor : MonoBehaviour {
     private static float  LINK_EDGE_DISTANCE     = 0.7f;
     private static float  LINK_JUMP_DISTANCE_X   = 5;
 
+    private static int LINK_MULTIPLIER = 5;
+    public static float MULTI_LINK_DISTANCE = 1;
+
     // Use this for initialization
     void Start () {
         if (DevelopmentSettings.ACTIVATE_NAVMESH)
@@ -178,13 +181,24 @@ public class NavMeshAttachor : MonoBehaviour {
         mid.transform.position = new Vector3(to.position.x + (from.position.x - to.position.x) / 2,
                                              to.position.y + (from.position.y - to.position.y) / 2,
                                              from.position.z);
-        NavMeshLink navLink = mid.AddComponent<NavMeshLink>();
-        navLink.startPoint = new Vector3((from.position.x - to.position.x) / 2, (from.position.y - to.position.y) / 2, 0); //leftLink.transform.position;
-        navLink.endPoint = new Vector3(-(from.position.x - to.position.x) / 2, -(from.position.y - to.position.y) / 2, 0);
-        navLink.width = Mathf.Min(from.localScale.z, to.localScale.z);
+  
+        //Add links
+        float distance = Mathf.Min(linkToGround[from].localScale.z, linkToGround[to].localScale.z);
+        for (float z = -distance/2+LINK_EDGE_DISTANCE; z < distance/2-LINK_EDGE_DISTANCE; z+=MULTI_LINK_DISTANCE)
+        {
+            for(int i = 0; i < LINK_MULTIPLIER; i++)
+            {
+                NavMeshLink navLink = mid.AddComponent<NavMeshLink>();
+                
+                navLink.startPoint = new Vector3((from.position.x - to.position.x) / 2, (from.position.y - to.position.y) / 2, z); //leftLink.transform.position;
+                navLink.endPoint = new Vector3(-(from.position.x - to.position.x) / 2, -(from.position.y - to.position.y) / 2, z);
+            }
+        }
+        //navLink.width = );
+        //Debug.Log(navLink.width+" " + name);
 
         // Add generated links to list
-        if(generated.ContainsKey(linkToGround[from])  && generated.ContainsKey(linkToGround[to])) {
+        if (generated.ContainsKey(linkToGround[from])  && generated.ContainsKey(linkToGround[to])) {
             Vector3 fromPoint = new Vector3(from.position.x, from.position.y, 0);
             Vector3 toPoint = new Vector3(to.position.x, to.position.y, 0);
 

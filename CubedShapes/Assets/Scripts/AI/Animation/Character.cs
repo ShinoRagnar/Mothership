@@ -172,8 +172,8 @@ public class Character: MonoBehaviour
             HandleAirborneMovement();
         }*/
 
-        ScaleCapsuleForCrouching(bodyState == BodyState.Crouching);
-        PreventStandingInLowHeadroom();
+        //ScaleCapsuleForCrouching(bodyState == BodyState.Crouching);
+        //PreventStandingInLowHeadroom();
 
         // send input and other state parameters to the animator
         UpdateAnimator(move);

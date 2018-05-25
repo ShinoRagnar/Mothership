@@ -6,6 +6,7 @@ public static class DevelopmentSettings
 {
     //Debug only objects
     public static bool SHOW_THREAT_LEVELS = true;
+    public static bool SHOW_DESTINATIONS = true;
 
     // Should be turned on
     public static bool SHOW_ATTACHMENTS = false;

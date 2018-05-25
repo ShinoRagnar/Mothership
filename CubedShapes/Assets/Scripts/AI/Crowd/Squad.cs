@@ -15,6 +15,27 @@ public class Squad {
 
     public string name;
 
+    public Vector2 GetXRangeOfMembers()
+    {
+        float left = 0;
+        float right = 0;
+        bool first = true;
+
+        foreach(GameUnit mem in members)
+        {
+            if(first || mem.body.position.x < left)
+            {
+                left = mem.body.position.x;
+            }
+            if (first || mem.body.position.x > right)
+            {
+                right = mem.body.position.x;
+            }
+            first = false;
+        }
+        return new Vector2(left, right);
+    }
+
     public Squad()
     {
         currentFormation = new UnitFormation(PlacementStrategy.MiddleAndOut);
@@ -22,27 +43,56 @@ public class Squad {
         members = new List<GameUnit>();
         activeSquads.Add(this, name);
     }
-    public void MoveAllSoldiers()
+    public void UpdateCharacterMove(GameUnit target, float acceptableStoppingDistanceFromTarget)
     {
+        foreach (GameUnit member in members)
+        {
+            if (IsTargetTooClose(target, member.body.position.x, member.body.position.y, acceptableStoppingDistanceFromTarget))
+            {
+                member.navMeshAgent.SetDestination(currentFormation.GetMoveFor(member));
+            }
+            else
+            {
+                member.navMeshAgent.SetDestination(member.body.position);
+            }
+
+            if (DevelopmentSettings.SHOW_DESTINATIONS)
+            {
+                Vector3 direction = member.navMeshAgent.destination - member.body.position;
+                Debug.DrawRay(member.body.position, direction, Color.green);
+            }
+
+            if (member.navMeshAgent.remainingDistance > member.navMeshAgent.stoppingDistance)
+            {
+                member.character.Move(member.navMeshAgent.desiredVelocity);
+            }
+            else
+            {
+                member.character.Move(Vector3.zero);
+            }
+        }
+
+    }
+    /*public bool MoveAllSoldiers()
+    {
+        bool finished = true;
         foreach (GameUnit member in members)
         {
             if (member.character.ShouldAct())
             {
                 member.character.gunState = GunState.Idle;
-                member.navMeshAgent.SetDestination(currentFormation.GetMoveFor(member));
-                if (member.navMeshAgent.remainingDistance > member.navMeshAgent.stoppingDistance)
+
+
+                if (! (Vector3.Distance(member.body.position,member.navMeshAgent.destination) < 1f))
                 {
-                    member.character.Move(member.navMeshAgent.desiredVelocity);
-                }
-                else
-                {
-                    member.character.Move(Vector3.zero);
-                    //member.character.Move(member.navMeshAgent.desiredVelocity);
+                    finished = false;
                 }
                 member.character.UpdateAnimatorState();
             }
+            else { finished = false; }
         }
-    }
+        return finished;
+    }*/
     public void AssignReactionTimesToAllMembers(float min, float max)
     {
         System.Random rand = Level.instance.rand;
@@ -71,7 +121,12 @@ public class Squad {
         {
             if (member.character.ShouldAct())
             {
-                member.character.FaceTarget(target.body.transform.position);
+
+                //Don't turn when moving
+                if (! (member.navMeshAgent.remainingDistance > member.navMeshAgent.stoppingDistance))
+                {
+                    member.character.FaceTarget(target.body.transform.position);
+                }
             }
         }
     }
@@ -113,7 +168,24 @@ public class Squad {
             jet.Show(gu.animator.GetBoneTransform(placement));
         }
     }
+    public bool IsTargetTooClose(GameUnit targ, float x, float y, float dist)
+    {
+        return IsTargetTooClose(targ, x, x, y, y, dist);
+    }
 
-
+    public bool IsTargetTooClose(GameUnit targ, float xMin, float xMax, float yMin, float yMax, float dist)
+    {
+        return (
+                    (targ.body.position.x + dist > xMin && targ.body.position.x < xMin)
+                    ||
+                    (targ.body.position.x - dist < xMax && targ.body.position.x > xMax)
+                )
+               &&
+               (
+                    (targ.body.position.y + dist > yMin && targ.body.position.y < yMin)
+                    ||
+                    (targ.body.position.y - dist < yMax && targ.body.position.y > yMax)
+                );
+    }
 
 }

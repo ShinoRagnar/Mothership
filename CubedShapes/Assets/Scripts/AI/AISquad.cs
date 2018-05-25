@@ -11,10 +11,14 @@ public enum AIState
 
 public class AISquad : MonoBehaviour {
 
+    public static float DISTANCE_MAX_SEARCH = 50;
+    public static float DISTANCE_INCREASE_PER_SEARCH = 10;
+
     public static float DISTANCE_PREFERRED = 20;
     public static float DISTANCE_TOO_CLOSE = 10;
 
     public static float IDLE_REACTION_TIME = 0.5f;
+    public static float RECALCULATE_POSITIONS = 1;
     public static int NUMBER_OF_SQUAD_MEMBERS_TO_LOOK_WHEN_IDLE = 3;
 
     public Squad squad;
@@ -68,31 +72,58 @@ public class AISquad : MonoBehaviour {
                 }
             }
         }
-        if (state == AIState.Hunting)
+        else
         {
-            if (IsTargetTooClose())
+            if (timeSinceLastChange > RECALCULATE_POSITIONS)
             {
-                
-                state = AIState.Fleeing;
-                Dictionary<Ground, float> possibleMoves = GetPossibleMovesAtDistanceFromTarget(DISTANCE_PREFERRED);
-
-                foreach (Ground p in possibleMoves.Keys)
-                {
-                    int reserves = squad.currentFormation.Move(p, possibleMoves[p], Squad.DEFAULT_SQUAD_SOLDIER_WIDTH);
-                    Debug.Log("Fleeing to: " + p.obj.name + " but with: " + reserves + " reserves");
-                    break;
-                }
+                timeSinceLastChange = 0;
+                squad.currentFormation.RecalculateClosestPositions();
             }
-            else { 
+
+            if (state == AIState.Hunting)
+            {
+                if (IsTargetTooClose())
+                {
+                    
+                    Dictionary<Ground, float> possibleMoves;
+                    int placed = 0;
+                    int reserves = 0;
+
+                    for (float i = DISTANCE_PREFERRED; i < DISTANCE_MAX_SEARCH; i += DISTANCE_INCREASE_PER_SEARCH)
+                    {
+                        possibleMoves = GetPossibleMovesAtDistanceFromTarget(i);
+                        placed = 0;
+                        reserves = 0;
+                        foreach (Ground p in possibleMoves.Keys)
+                        {
+                            reserves = squad.currentFormation.Move(p, possibleMoves[p], placed, Squad.DEFAULT_SQUAD_SOLDIER_WIDTH);
+                            placed = squad.members.Count - reserves;
+                            Debug.Log(placed + " soldiers going to: " + p.obj.name);
+                            if (reserves == 0)
+                            {
+                                break;
+                            }
+                        }
+                        if(possibleMoves.Count > 0 && reserves == 0)
+                        {
+                            break;
+                        }
+                    }
+                    
+                    Debug.Log("Reserves after search: "+reserves);
+
+                    squad.currentFormation.RecalculateClosestPositions();
+
+                }
                 squad.TellAllMembersToAimFor(target);
                 squad.TurnAllMembersTowardsTarget(target);
                 squad.TellMembersThatCanSeeToShoot(target);
+                
             }
+
+            squad.UpdateCharacterMove(target,DISTANCE_PREFERRED);
         }
-        if(state == AIState.Fleeing)
-        {
-            squad.MoveAllSoldiers();
-        }
+      
 	}
 
     protected GameUnit LookForEnemy(GameUnit looker, Faction lookForCharacterOfThisFaction)
@@ -176,10 +207,24 @@ public class AISquad : MonoBehaviour {
     }
     protected bool IsTargetTooClose()
     {
-        return Mathf.Abs(squad.currentFormation.GetFormationCenter().x - target.body.position.x) < DISTANCE_TOO_CLOSE
+        Vector2 range = squad.GetXRangeOfMembers();
+        return squad.IsTargetTooClose(
+            target,
+            range.x,
+            range.y,
+            squad.currentFormation.GetFormationCenter().y,
+            squad.currentFormation.GetFormationCenter().y,
+            DISTANCE_TOO_CLOSE
+            );
+        /*return  (
+                    (target.body.position.x + DISTANCE_TOO_CLOSE > range.x && target.body.position.x < range.x)
+                    ||
+                    (target.body.position.x - DISTANCE_TOO_CLOSE < range.y && target.body.position.x > range.y)
+                )
                &&
                Mathf.Abs(squad.currentFormation.GetFormationCenter().y - target.body.position.y) < DISTANCE_TOO_CLOSE
-               ;
+               ;*/
     }
+
 
 }

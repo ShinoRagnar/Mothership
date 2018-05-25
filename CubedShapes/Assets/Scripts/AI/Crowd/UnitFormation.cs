@@ -32,6 +32,7 @@ public class UnitFormation  {
     public int reserves;
     public int placed;
 
+
     public UnitFormation(PlacementStrategy strategy)
     {
         this.currentStrategy = strategy;
@@ -40,13 +41,79 @@ public class UnitFormation  {
         this.reserves = 0;
         this.placed = 0;
     }
-    public int Move(Ground ground, float xStart, float unitWidth)
+    public int Move(Ground ground, float xStart, int offset, float unitWidth)
     {
-        return ProjectFormationOn(ground, xStart, unitWidth, placedUnits.Count);
+        return ProjectOn(ground, xStart, unitWidth, offset, placedUnits.Count);
     }
     public void Place(int i, GameUnit unit)
     {
         placedUnits.Add(unit,i);
+    }
+    public void RecalculateClosestPositions()
+    {
+        Dictionary<GameUnit, int> newPlacedUnits = new Dictionary<GameUnit, int>();
+        Dictionary<Vector3, int> placementsReverse = new Dictionary<Vector3, int>();
+        Vector3[] placSort = new Vector3[placements.Keys.Count];
+
+        float memberSumX = 0;
+        float placemSumX = 0;
+
+        //Find average x pos for units - This determines the direction we are heading
+        foreach(GameUnit gu in placedUnits.Keys)
+        {
+            memberSumX += gu.body.position.x;
+        }
+        // 
+        foreach (int i in placements.Keys)
+        {
+            Vector3 plac = placements[i];
+            if (!placementsReverse.ContainsKey(plac))
+            {
+                placementsReverse.Add(plac, i);
+            }
+            placSort[i] = plac;
+            placemSumX += plac.x;
+        }
+
+        // Going left to right
+        if (memberSumX < placemSumX)
+        {
+            System.Array.Sort(placSort, LeftToRightMovement);
+        }
+        else
+        {
+            System.Array.Sort(placSort, RightToLeftMovement);
+        }
+        
+        //Find closest pos
+        for(int p = 0; p < placSort.Length; p++)
+        {
+            Vector3 plac = placSort[p];
+
+            GameUnit closest = null;
+            foreach (GameUnit g in placedUnits.Keys)
+            {
+                if (!newPlacedUnits.ContainsKey(g))
+                {
+                    if (closest == null)
+                    {
+                        closest = g;
+                    }
+                    else if (Vector3.Distance(g.body.position, plac) < Vector3.Distance(closest.body.position, plac))
+                    {
+                        closest = g;
+                    }
+                }
+            }
+            if (closest != null)
+            {
+                
+                newPlacedUnits.Add(closest, placementsReverse[plac]);
+            }
+        }
+
+        placedUnits = newPlacedUnits;
+
     }
     public Vector3 GetMoveFor(GameUnit unit)
     {
@@ -66,8 +133,13 @@ public class UnitFormation  {
     }
     public int ProjectFormationOn(Ground ground, float xStart, float unitWidth, int numberOfUnits)
     {
+        return ProjectOn(ground, xStart, unitWidth,0, numberOfUnits);
+    }
+    private int ProjectOn(Ground ground, float xStart, float unitWidth, int offset, int numberOfUnits)
+    {
+
         reserves = 0;
-        placed = 0;
+        placed = offset;
 
         currentlyOn = ground;
         currentlyAtX = xStart;
@@ -158,9 +230,62 @@ public class UnitFormation  {
         }
         return true;
     }
+    private int LeftToRightMovement(Vector3 value1, Vector3 value2)
+    {
+        if (value1.x > value2.x)
+        {
+            return -1;
+        }
+        else if (value1.x == value2.x)
+        {
+                if (value1.z > value2.z)
+                {
+                    return -1;
+                }
+                else if (value1.z == value2.z)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
 
+        }
+        else
+        {
+            return 1;
+        }
+    }
+    private int RightToLeftMovement(Vector3 value1, Vector3 value2)
+    {
+        if (value1.x < value2.x)
+        {
+            return -1;
+        }
+        else if (value1.x == value2.x)
+        {
+            if (value1.z > value2.z)
+            {
+                return -1;
+            }
+            else if (value1.z == value2.z)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+
+        }
+        else
+        {
+            return 1;
+        }
+    }
     /*
-	public static ArrayList ProjectFormationOn(PlacementStrategy strategy, Ground ground, float xStart, float unitWidth, int numberOfUnits)
+    public static ArrayList ProjectFormationOn(PlacementStrategy strategy, Ground ground, float xStart, float unitWidth, int numberOfUnits)
     {
     }*/
 }

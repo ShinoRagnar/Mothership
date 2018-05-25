@@ -62,6 +62,8 @@ public class GameUnit{
 
         //Sets
         this.navMeshAgent = this.body.gameObject.AddComponent<NavMeshAgent>();
+        this.navMeshAgent.stoppingDistance = 1f;
+        this.navMeshAgent.speed = 7;
         this.itemEquiper = this.body.gameObject.AddComponent<ItemEquiper>();
         this.itemEquiper.owner = this;
         this.character = this.body.gameObject.AddComponent<Character>();
