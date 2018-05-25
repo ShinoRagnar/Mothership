@@ -203,6 +203,7 @@ public class AISquad : MonoBehaviour {
                                 )
                             )
                         {
+                            // Should not always pick the midpoint
                             possibleMoves.Add(consideration, consideration.GetMidPoint().x);
                         }
                     }

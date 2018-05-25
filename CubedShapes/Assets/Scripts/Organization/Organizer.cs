@@ -67,6 +67,9 @@ public class Organizer : MonoBehaviour {
     public Transform P_SFI_WALL_LOW_DOUBLE;
     public Transform P_SFI_WALL_LOW_WINDOW;
     public Transform P_SFI_WALL_LOW_WINDOW_DOUBLE;
+    //Images
+    public Transform[] BUFFS;
+    
 
     //Visor
     //public Transform P_VISOR_STANDARD_ORANGE;

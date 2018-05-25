@@ -153,7 +153,7 @@ public class UnitFormation  {
         float width = ground.obj.localScale.z - GROUND_MARGIN * 2;
         float unitsInRank = Mathf.FloorToInt(width / unitWidth);
         float maxRanks = ground.obj.localScale.x/ unitWidth;
-        Debug.Log("Width: " + width + " unitsinRank: " + unitsInRank + " maxRanks" + maxRanks);
+        //Debug.Log("Width: " + width + " unitsinRank: " + unitsInRank + " maxRanks" + maxRanks);
 
         for (int i = 0; i < unitsInRank*(maxRanks); i++)
         {

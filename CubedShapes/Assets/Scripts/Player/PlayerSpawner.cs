@@ -68,6 +68,14 @@ public class PlayerSpawner : MonoBehaviour {
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_PLAYER, playerNode.gameObject);
         Organizer.SetLayerOfThisAndChildren(Organizer.LAYER_SHIELDS, playerShield.gameObject);
 
+        // TEST to be deleted
+        GameObject go = GameObject.Find("Debuff");
+        Transform gg = Instantiate(o.BUFFS[0]);
+        gg.SetParent(go.transform, false);
+
+        
+
+
         //Shows threat levels (For debug purposes)
         if (DevelopmentSettings.SHOW_THREAT_LEVELS) { 
             GameObject threatPreferred = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -104,4 +112,6 @@ public class PlayerSpawner : MonoBehaviour {
             rendLast.material.SetColor("_SpecColor", Color.black);
         }
     }
+
+  
 }
